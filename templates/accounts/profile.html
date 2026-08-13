@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile — LocalHer{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="lh-card p-4 p-md-5">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold fs-3" style="width: 64px; height: 64px; background: var(--lh-primary);">
+                        {{ user.first_name|first|default:user.username|first|upper }}
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">{{ user.get_full_name|default:user.username }}</h4>
+                        <p class="text-muted small mb-0">
+                            <i class="fa-solid fa-location-dot me-1"></i> {{ user.area|default:'Neighborhood' }}, {{ user.city|default:'Local City' }} ({{ user.pincode|default:'N/A' }})
+                            <span class="badge {% if user.is_seller %}bg-danger{% else %}bg-primary{% endif %} ms-2">
+                                {{ user.is_seller|yesno:'Seller & Customer,Customer' }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <h5 class="fw-bold mb-3 font-heading">Personal Account Information</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Email Address</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Phone Number</label>
+                            {{ form.phone_number }}
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-3 font-heading">Location Details</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small">City</label>
+                            {{ form.city }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small">Area</label>
+                            {{ form.area }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small">Pincode</label>
+                            {{ form.pincode }}
+                        </div>
+                    </div>
+
+                    {% if seller_form %}
+                    <hr class="my-4">
+                    <h5 class="fw-bold mb-3 font-heading text-danger"><i class="fa-solid fa-store me-2"></i> Business Storefront Information</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Business Name</label>
+                            {{ seller_form.business_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">WhatsApp Number for Customer Orders</label>
+                            {{ seller_form.whatsapp_number }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small">Business Bio / Story</label>
+                            {{ seller_form.bio }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small">Store Cover Banner Image</label>
+                            <input type="file" name="cover_image" class="form-control" accept="image/*">
+                            {% if user.seller_profile.cover_image %}
+                            <div class="mt-2">
+                                <span class="small text-muted d-block mb-1">Current Banner:</span>
+                                <img src="{{ user.seller_profile.cover_image.url }}" class="rounded img-fluid" style="max-height: 120px; object-fit: cover;" alt="Banner">
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-lh-accent py-3 px-5 fw-bold fs-6">
+                        <i class="fa-solid fa-floppy-disk me-2"></i> Save Profile & Store Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

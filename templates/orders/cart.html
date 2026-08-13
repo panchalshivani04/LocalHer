@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}My Cart — LocalHer{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Page Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+        <div>
+            <h3 class="fw-bold font-heading mb-1 text-dark">
+                <i class="fa-solid fa-basket-shopping text-danger me-2"></i> My Shopping Cart
+            </h3>
+            <p class="text-muted small mb-0">Review items added from local women entrepreneurs in your neighborhood.</p>
+        </div>
+        {% if cart_items %}
+        <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-bold">
+            {{ cart_items|length }} {% if cart_items|length == 1 %}Item{% else %}Items{% endif %}
+        </span>
+        {% endif %}
+    </div>
+
+    {% if cart_items %}
+    <div class="row g-4">
+        <!-- Cart Items List -->
+        <div class="col-lg-8">
+            <div class="d-flex flex-column gap-3 mb-4">
+                {% for item in cart_items %}
+                <div class="lh-card p-3 p-md-4 bg-white border shadow-sm rounded-4">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <!-- Product Image & Details -->
+                        <div class="d-flex align-items-center gap-3 overflow-hidden" style="max-width: 320px;">
+                            <div class="rounded-3 bg-light overflow-hidden border" style="width: 80px; height: 80px; flex-shrink: 0;">
+                                {% if item.product.primary_image %}
+                                <img src="{{ item.product.primary_image.url }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ item.product.title }}">
+                                {% else %}
+                                <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                                    <i class="fa-solid fa-image fs-3 opacity-25"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="overflow-hidden">
+                                <span class="badge bg-light text-dark border px-2 py-1 mb-1 fw-semibold" style="font-size: 0.7rem;">
+                                    <i class="fa-solid fa-store me-1 text-danger"></i> {{ item.product.seller.business_name }}
+                                </span>
+                                <h6 class="fw-bold text-dark mb-1 text-truncate">
+                                    <a href="{% url 'product_detail' item.product.slug %}" class="text-dark text-decoration-none">{{ item.product.title }}</a>
+                                </h6>
+                                <div class="small text-muted">
+                                    ₹{{ item.product.price }} <span class="text-muted font-normal">/ {{ item.product.price_unit }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quantity Selector, Line Price & Remove Button -->
+                        <div class="d-flex align-items-center gap-3 ms-auto">
+                            <!-- Quantity Controls -->
+                            <div class="input-group input-group-sm" style="width: 115px;">
+                                <a href="{% url 'update_cart_quantity' item.id 'decrease' %}" class="btn btn-outline-secondary px-2 fw-bold" title="Decrease quantity">-</a>
+                                <span class="input-group-text bg-white fw-bold px-3 text-dark">{{ item.quantity }}</span>
+                                <a href="{% url 'update_cart_quantity' item.id 'increase' %}" class="btn btn-outline-secondary px-2 fw-bold" title="Increase quantity">+</a>
+                            </div>
+
+                            <!-- Line Item Total -->
+                            <div class="text-end" style="min-width: 90px;">
+                                <span class="fw-extrabold fs-5 text-danger d-block">₹{{ item.total_price }}</span>
+                            </div>
+
+                            <!-- Remove Button -->
+                            <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-sm btn-outline-danger p-2 rounded-circle" title="Remove Item">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between">
+                <a href="{% url 'marketplace' %}" class="btn btn-outline-secondary px-4 py-2 fw-semibold">
+                    <i class="fa-solid fa-arrow-left me-2"></i> Continue Browsing Marketplace
+                </a>
+            </div>
+        </div>
+
+        <!-- Order Summary Column -->
+        <div class="col-lg-4">
+            <div class="lh-card p-4 bg-white border shadow-sm sticky-top rounded-4" style="top: 90px;">
+                <h5 class="fw-bold mb-3 font-heading text-dark">Order Summary</h5>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Total Cart Items</span>
+                    <span class="fw-semibold text-dark">{{ cart_items|length }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Item Subtotal</span>
+                    <span class="fw-semibold text-dark">₹{{ total_amount }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Delivery / Pickup</span>
+                    <span class="text-success fw-bold">Direct Seller Pickup</span>
+                </div>
+                
+                <hr class="my-3">
+                
+                <div class="d-flex justify-content-between mb-4">
+                    <strong class="fs-5 text-dark">Estimated Total</strong>
+                    <strong class="fs-3 text-danger">₹{{ total_amount }}</strong>
+                </div>
+
+                <a href="{% url 'checkout' %}" class="btn btn-lh-accent btn-lg w-100 fw-bold py-3 fs-6 shadow-sm mb-3">
+                    Proceed to Order Request <i class="fa-solid fa-arrow-right ms-2"></i>
+                </a>
+
+                <!-- Guarantee Note -->
+                <div class="p-3 bg-light rounded-3 border text-center">
+                    <i class="fa-solid fa-shield-heart text-danger fs-5 mb-1 d-block"></i>
+                    <span class="small text-muted d-block" style="font-size: 0.8rem; line-height: 1.4;">
+                        No online payment required now. Order requests are sent directly to the local seller for neighborhood fulfillment.
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Empty Cart State -->
+    <div class="lh-card p-5 text-center bg-white border shadow-sm rounded-4 max-w-xl mx-auto my-4">
+        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3 text-muted" style="width: 80px; height: 80px; background: #F3F4F6;">
+            <i class="fa-solid fa-basket-shopping fs-1 opacity-50"></i>
+        </div>
+        <h4 class="fw-bold mb-2 text-dark font-heading">Your Cart is Empty</h4>
+        <p class="text-muted mb-4 fs-6">You haven't added any homemade products or services to your cart yet.</p>
+        <a href="{% url 'marketplace' %}" class="btn btn-lh-accent btn-lg px-5 py-3 fw-bold">
+            <i class="fa-solid fa-store me-2"></i> Explore Marketplace Now
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

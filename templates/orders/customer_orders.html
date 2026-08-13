@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders — LocalHer{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h3 class="fw-bold font-heading mb-4"><i class="fa-solid fa-box-open text-danger me-2"></i> My Order Requests</h3>
+
+    {% if orders %}
+    <div class="row g-4">
+        {% for order in orders %}
+        <div class="col-12">
+            <div class="lh-card p-4">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pb-3 mb-3 border-bottom">
+                    <div>
+                        <span class="badge bg-secondary me-2">Order #{{ order.id }}</span>
+                        <strong class="text-dark">Seller: {{ order.seller.business_name }}</strong>
+                        <span class="text-muted small ms-2"><i class="fa-solid fa-calendar me-1"></i> {{ order.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <div>
+                        <span class="badge {% if order.status == 'PENDING' %}bg-warning text-dark{% elif order.status == 'ACCEPTED' %}bg-primary{% elif order.status == 'FULFILLED' %}bg-success{% else %}bg-danger{% endif %} fs-7 py-2 px-3">
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row align-items-center mb-3">
+                    <div class="col-md-8">
+                        <ul class="list-unstyled mb-2">
+                            {% for item in order.items.all %}
+                            <li class="small py-1">
+                                <i class="fa-solid fa-check text-success me-2"></i> {{ item.quantity }}x <strong>{{ item.product.title|default:'Product' }}</strong> (₹{{ item.price }} / unit)
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% if order.notes %}
+                        <p class="small text-muted mb-0"><strong>Note:</strong> {{ order.notes }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <div class="fw-bold fs-4 text-danger mb-2">₹{{ order.total_amount }}</div>
+                        {% if order.seller.whatsapp_number %}
+                        <a href="https://wa.me/91{{ order.seller.whatsapp_number }}?text=Hi%20{{ order.seller.business_name }},%20regarding%20my%20Order%20%23{{ order.id }}..." target="_blank" class="btn btn-sm btn-whatsapp">
+                            <i class="fa-brands fa-whatsapp me-1"></i> Chat on WhatsApp
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Prompt Feedback Box When Order is Fulfilled -->
+                {% if order.status == 'FULFILLED' %}
+                <div class="p-4 rounded-4 mt-3" style="background: #FFFBF0; border: 1.5px dashed #F59E0B;">
+                    <div class="d-flex align-items-center gap-2 mb-2 text-warning">
+                        <i class="fa-solid fa-star fs-4"></i>
+                        <h6 class="fw-bold text-dark mb-0">Order Completed & Taken! Please Rate & Support {{ order.seller.business_name }}</h6>
+                    </div>
+                    <p class="small text-muted mb-3">Your feedback helps this local woman entrepreneur grow her business and build trust in your neighborhood.</p>
+                    
+                    {% for item in order.items.all %}
+                    {% if item.product %}
+                    <form method="POST" action="{% url 'add_review' item.product.id %}" class="bg-white p-3 rounded-3 border mb-2">
+                        {% csrf_token %}
+                        <div class="row align-items-center g-3">
+                            <div class="col-md-3">
+                                <span class="fw-bold text-dark small d-block">{{ item.product.title }}</span>
+                                <span class="badge badge-category" style="font-size: 0.7rem;">Verified Purchase</span>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold mb-1">Your Rating</label>
+                                <select name="rating" class="form-select form-select-sm fw-bold text-warning">
+                                    <option value="5" selected>⭐⭐⭐⭐⭐ (5/5 Excellent)</option>
+                                    <option value="4">⭐⭐⭐⭐ (4/5 Very Good)</option>
+                                    <option value="3">⭐⭐⭐ (3/5 Good)</option>
+                                    <option value="2">⭐⭐ (2/5 Average)</option>
+                                    <option value="1">⭐ (1/5 Poor)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold mb-1">Feedback Comment</label>
+                                <input type="text" name="comment" class="form-control form-control-sm" placeholder="e.g. Delicious pickles! Great fitting!" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label d-none d-md-block opacity-0">Submit</label>
+                                <button type="submit" class="btn btn-sm btn-lh-accent w-100 fw-bold">Submit Review</button>
+                            </div>
+                        </div>
+                    </form>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fa-solid fa-receipt fs-1 text-muted opacity-50 mb-3"></i>
+        <h4>No order requests yet</h4>
+        <p class="text-muted small">You haven't submitted order requests to any local sellers yet.</p>
+        <a href="{% url 'marketplace' %}" class="btn btn-lh-accent mt-2"><i class="fa-solid fa-store me-1"></i> Explore Marketplace</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Create {{ role|capfirst }} Account — LocalHer{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="lh-card p-4 p-md-5">
+                
+                <!-- Account Role Header Tabs -->
+                <ul class="nav nav-pills nav-justified mb-4 p-1 bg-light rounded-3">
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold {% if role == 'customer' %}active bg-dark text-white{% else %}text-muted{% endif %}" href="{% url 'register' %}">
+                            <i class="fa-solid fa-user me-1"></i> Customer Account
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold {% if role == 'seller' %}active bg-danger text-white{% else %}text-muted{% endif %}" href="{% url 'register_seller' %}">
+                            <i class="fa-solid fa-store me-1"></i> Seller & Business Account
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold mb-1">
+                        {% if role == 'seller' %}
+                            Register Your Business on LocalHer
+                        {% else %}
+                            Join LocalHer Community
+                        {% endif %}
+                    </h3>
+                    <p class="text-muted small">
+                        {% if role == 'seller' %}
+                            Showcase your homemade products and services to local customers in your neighborhood.
+                        {% else %}
+                            Discover homemade pickles, custom tailoring, baking, and local services near you.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    
+                    <h6 class="fw-bold text-uppercase text-muted fs-7 mb-3">1. Personal Account Details</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Username *</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Email Address *</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Password *</label>
+                            {{ form.password }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Confirm Password *</label>
+                            {{ form.confirm_password }}
+                            {% if form.confirm_password.errors %}<div class="text-danger small mt-1">{{ form.confirm_password.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-uppercase text-muted fs-7 mb-3">2. Contact & Local Area</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Phone Number</label>
+                            {{ form.phone_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">City *</label>
+                            {{ form.city }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Area / Neighborhood *</label>
+                            {{ form.area }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Pincode *</label>
+                            {{ form.pincode }}
+                        </div>
+                    </div>
+
+                    {% if role == 'seller' %}
+                    <h6 class="fw-bold text-uppercase text-danger fs-7 mb-3">3. Business Storefront Information</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Business Name *</label>
+                            {{ form.business_name }}
+                            {% if form.business_name.errors %}<div class="text-danger small mt-1">{{ form.business_name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">WhatsApp Number for Customer Inquiries</label>
+                            {{ form.whatsapp_number }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small">Business Description / Bio</label>
+                            {{ form.bio }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn {% if role == 'seller' %}btn-lh-accent{% else %}btn-lh-primary{% endif %} w-100 py-3 fw-semibold fs-6">
+                        <i class="fa-solid fa-check-circle me-2"></i> Complete Registration
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

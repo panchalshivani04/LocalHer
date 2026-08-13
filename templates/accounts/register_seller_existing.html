@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Start Selling — Activate Your Seller Storefront{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="lh-card p-4 p-md-5 bg-white border shadow-sm rounded-4">
+                <div class="text-center mb-4">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3 text-white fw-bold fs-3" style="width: 64px; height: 64px; background: var(--lh-accent);">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1 font-heading text-dark">Activate Your Seller Storefront</h3>
+                    <p class="text-muted small">You are currently logged in as <strong>{{ user.get_full_name|default:user.username }}</strong>. Enter your business details below to start selling items on LocalHer.</p>
+                </div>
+
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-dark">Business / Storefront Name *</label>
+                        <input type="text" name="business_name" class="form-control" placeholder="e.g. Priya Homemade Pickles or Sunita Tailoring" required autofocus>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-dark">Direct Contact Phone / WhatsApp Number *</label>
+                        <input type="text" name="whatsapp_number" class="form-control" placeholder="10-digit mobile number for order calls" value="{{ user.phone_number|default:'' }}" required>
+                        <span class="small text-muted">Customers in your local area will call this number for orders.</span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-dark">Business Bio / About Your Products (Optional)</label>
+                        <textarea name="bio" class="form-control" rows="3" placeholder="Tell local customers about your specialty, ingredients, or turnaround time..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-lh-accent btn-lg w-100 fw-bold py-3 fs-6 shadow-sm mb-3">
+                        <i class="fa-solid fa-rocket me-2"></i> Launch My Storefront Now
+                    </button>
+
+                    <div class="text-center">
+                        <a href="{% url 'home' %}" class="small text-muted fw-semibold text-decoration-none">
+                            <i class="fa-solid fa-arrow-left me-1"></i> Cancel & Return Home
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

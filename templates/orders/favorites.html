@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}My Saved Items — LocalHer{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h3 class="fw-bold font-heading mb-4"><i class="fa-solid fa-heart text-danger me-2"></i> Saved & Favorite Items</h3>
+
+    {% if favorites %}
+    <div class="row g-4">
+        {% for fav in favorites %}
+        <div class="col-md-6 col-lg-3">
+            <div class="lh-card h-100 d-flex flex-column">
+                <div class="position-relative bg-light text-center" style="height: 180px; overflow: hidden;">
+                    {% if fav.product.primary_image %}
+                    <img src="{{ fav.product.primary_image.url }}" class="w-100 h-100" style="object-fit: cover;" alt="">
+                    {% else %}
+                    <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                        <i class="fa-solid fa-image fs-1 opacity-25"></i>
+                    </div>
+                    {% endif %}
+                    <a href="{% url 'toggle_favorite' fav.product.id %}" class="position-absolute top-0 end-0 m-2 btn btn-sm bg-white rounded-circle shadow-sm px-2 py-1 text-danger">
+                        <i class="fa-solid fa-heart"></i>
+                    </a>
+                </div>
+
+                <div class="p-3 d-flex flex-column flex-grow-1">
+                    <span class="badge-category mb-1 align-self-start">{{ fav.product.category.name }}</span>
+                    <h6 class="fw-bold text-dark mb-1 text-truncate">
+                        <a href="{% url 'product_detail' fav.product.slug %}" class="text-dark text-decoration-none">{{ fav.product.title }}</a>
+                    </h6>
+                    <p class="small text-muted mb-2">By {{ fav.product.seller.business_name }}</p>
+
+                    <div class="mt-auto pt-2 d-flex align-items-center justify-content-between border-top">
+                        <span class="fw-bold fs-5 text-dark">₹{{ fav.product.price }}</span>
+                        <a href="{% url 'add_to_cart' fav.product.id %}" class="btn btn-sm btn-lh-accent">Add to Cart</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fa-regular fa-heart fs-1 text-muted opacity-50 mb-3"></i>
+        <h4>No saved items yet</h4>
+        <p class="text-muted small">Save products and services you love while browsing to access them anytime.</p>
+        <a href="{% url 'marketplace' %}" class="btn btn-lh-accent mt-2"><i class="fa-solid fa-grid-2 me-1"></i> Browse Marketplace</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}LocalHer Marketplace — Nearby Products & Services{% endblock %}
+
+{% block content %}
+<!-- Welcome & Location Greeting Header (Vibrant & Colorful) -->
+<section class="py-4">
+    <div class="container">
+        <div class="lh-card p-4 p-md-5 border-0 shadow-lg text-white" style="background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-4 position-relative" style="z-index: 2;">
+                <div>
+                    <span class="badge px-3 py-2 rounded-pill fs-7 fw-bold mb-3 d-inline-flex align-items-center gap-2" style="background: rgba(224, 90, 71, 0.25); color: #FF9E93; border: 1px solid rgba(224, 90, 71, 0.4);">
+                        <i class="fa-solid fa-location-dot text-danger"></i> {{ user.area|default:'Your Neighborhood' }}, {{ user.city|default:'City' }} {% if user.pincode %}({{ user.pincode }}){% endif %}
+                    </span>
+                    <h2 class="display-6 fw-extrabold text-white mb-2 font-heading">Welcome back, {{ user.first_name|default:user.username }}! 👋</h2>
+                    <p class="fs-5 text-light opacity-90 mb-0">What would you like to discover from local women creators today?</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'marketplace' %}" class="btn btn-lh-accent px-4 py-3 fw-bold fs-6 shadow-sm">
+                        <i class="fa-solid fa-sliders me-2"></i> Filter By Price & Category
+                    </a>
+                </div>
+            </div>
+            <!-- Decorative Glow -->
+            <div class="position-absolute" style="right: -60px; bottom: -60px; width: 260px; height: 260px; background: rgba(224, 90, 71, 0.3); filter: blur(60px); border-radius: 50%; z-index: 1;"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Category Pills Grid -->
+<section class="py-4">
+    <div class="container">
+        <h4 class="fw-bold mb-4 font-heading">Explore Categories</h4>
+        <div class="row g-4">
+            {% for cat in categories %}
+            <div class="col-lg-3 col-md-4 col-6">
+                <a href="{% url 'marketplace' %}?category={{ cat.slug }}" class="text-decoration-none">
+                    <div class="lh-card category-card p-4 d-flex align-items-center gap-3 h-100">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center text-danger" style="width: 52px; height: 52px; background: var(--lh-accent-soft); flex-shrink: 0;">
+                            <i class="fa-solid {{ cat.icon_class }} fs-4"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <h6 class="fw-bold text-dark mb-1" style="font-size: 1.05rem;">{{ cat.name }}</h6>
+                            <span class="small text-muted">Browse items</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Products Feed — Clean & Spacious Cards -->
+<section class="py-5 bg-white">
+    <div class="container py-2">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold mb-1 font-heading">Products & Services Near You</h3>
+                <p class="text-muted">Directly from home cooks, tailors, bakers, and local women creators</p>
+            </div>
+            <a href="{% url 'marketplace' %}" class="text-danger fw-bold text-decoration-none fs-6">See All Items <i class="fa-solid fa-arrow-right ms-1"></i></a>
+        </div>
+
+        <div class="row g-4">
+            {% for product in products %}
+            <div class="col-lg-4 col-md-6">
+                <div class="lh-card lh-product-card h-100 d-flex flex-column rounded-4 overflow-hidden shadow-sm">
+                    <!-- Image Container with Smooth Zoom -->
+                    <div class="position-relative bg-light text-center img-zoom-container" style="height: 220px;">
+                        {% if product.primary_image %}
+                        <img src="{{ product.primary_image.url }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ product.title }}">
+                        {% else %}
+                        <div class="d-flex align-items-center justify-content-center h-100 text-muted bg-light">
+                            <i class="fa-solid fa-image fs-1 opacity-25"></i>
+                        </div>
+                        {% endif %}
+
+                        <!-- Top Badges -->
+                        <div class="position-absolute top-0 start-0 m-3 d-flex gap-2">
+                            <span class="badge {% if product.product_type == 'SERVICE' %}bg-success text-white{% else %}bg-secondary text-white{% endif %} shadow-sm px-3 py-2 rounded-pill fw-bold" style="font-size: 0.75rem;">
+                                <i class="fa-solid {% if product.product_type == 'SERVICE' %}fa-handshake{% else %}fa-box{% endif %} me-1"></i> {{ product.get_product_type_display }}
+                            </span>
+                        </div>
+
+                        <a href="{% url 'toggle_favorite' product.id %}" class="position-absolute top-0 end-0 m-3 btn btn-sm bg-white rounded-circle shadow-sm px-2 py-1 text-danger" title="Save Item">
+                            <i class="fa-regular fa-heart fs-6"></i>
+                        </a>
+                    </div>
+
+                    <!-- Card Content Body with Clean Neutral Spacing -->
+                    <div class="p-4 d-flex flex-column flex-grow-1 bg-white">
+                        
+                        <!-- Category & Location Row -->
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge bg-light text-dark border px-3 py-1 rounded-pill fw-semibold" style="font-size: 0.75rem;">
+                                {{ product.category.name }}
+                            </span>
+                            <span class="small text-muted fw-semibold">
+                                <i class="fa-solid fa-location-dot text-danger me-1"></i>{{ product.area }}
+                            </span>
+                        </div>
+
+                        <!-- Title Section with fixed line height -->
+                        <h5 class="fw-bold text-dark mb-3 font-heading" style="line-height: 1.4; min-height: 2.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            <a href="{% url 'product_detail' product.slug %}" class="text-dark text-decoration-none">{{ product.title }}</a>
+                        </h5>
+
+                        <!-- Seller Info Box (Clean Neutral Border) -->
+                        <div class="p-2 px-3 rounded-3 mb-3 d-flex align-items-center justify-content-between bg-light border">
+                            <div class="d-flex align-items-center gap-2 overflow-hidden">
+                                <div class="seller-avatar-sm" style="width: 28px; height: 28px; background: var(--lh-primary); color: white; border-radius: 50%; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    {{ product.seller.business_name|first|upper }}
+                                </div>
+                                <div class="text-truncate">
+                                    <a href="{% url 'seller_profile' product.seller.slug %}" class="text-dark fw-bold small text-decoration-none d-block text-truncate" style="max-width: 120px;">
+                                        {{ product.seller.business_name }}
+                                    </a>
+                                </div>
+                                <i class="fa-solid fa-circle-check text-success small" title="Verified Local Seller"></i>
+                            </div>
+
+                            <div class="text-nowrap ms-2">
+                                {% if product.average_rating > 0 %}
+                                <span class="badge bg-white text-dark border px-2 py-1 fw-bold" style="font-size: 0.75rem;">⭐ {{ product.average_rating }}</span>
+                                {% else %}
+                                <span class="badge bg-white text-muted border px-2 py-1" style="font-size: 0.7rem;">New</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Price & Action Section -->
+                        <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between">
+                            <div>
+                                <span class="fw-bold fs-4 text-dark d-block mb-0" style="line-height: 1.1;">₹{{ product.price }}</span>
+                                <span class="small text-muted" style="font-size: 0.7rem;">{{ product.price_unit }}</span>
+                            </div>
+                            <a href="{% url 'add_to_cart' product.id %}" class="btn btn-lh-accent px-3 py-2 fw-bold fs-6 shadow-sm">
+                                <i class="fa-solid fa-cart-plus me-1"></i> Add To Cart
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="fa-solid fa-store-slash fs-1 text-muted opacity-50 mb-3"></i>
+                <h5>No products listed yet in your area</h5>
+                <p class="text-muted">Be the first to list your products or check back soon!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

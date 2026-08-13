@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}LocalHer — Support Local Women Entrepreneurs{% endblock %}
+
+{% block content %}
+<!-- Centered Hero Section — Clean, Spacious & Impactful -->
+<section class="py-5 text-center" style="background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%); color: #ffffff;">
+    <div class="container py-5" style="max-width: 900px;">
+        <span class="badge bg-danger px-4 py-2 rounded-pill fs-6 mb-4 text-uppercase fw-bold">Support Local Women</span>
+        <h1 class="display-3 fw-extrabold text-white mb-4" style="line-height: 1.2;">
+            Homemade Pickles, Tailoring & Cakes <br><span style="color: var(--lh-accent);">From Women In Your Neighborhood</span>
+        </h1>
+        <p class="fs-4 text-light opacity-90 mb-5 leading-relaxed mx-auto" style="max-width: 680px;">
+            Order authentic homemade food, snacks, custom stitching, baking, and beauty services directly from women entrepreneurs near you.
+        </p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="{% url 'register' %}" class="btn btn-lh-accent btn-lg px-5 py-3 fs-5 fw-bold">
+                Join LocalHer Community <i class="fa-solid fa-arrow-right ms-2"></i>
+            </a>
+            <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-5 py-3 fs-5 fw-semibold rounded-3">
+                Log In To Account
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- 3 Simple Steps Section -->
+<section class="py-5 bg-white border-bottom">
+    <div class="container py-4">
+        <div class="text-center max-w-2xl mx-auto mb-5">
+            <h2 class="fw-bold mb-3 font-heading text-dark">How LocalHer Works</h2>
+            <p class="text-muted fs-5 mb-0">Simple and easy for everyone in your local community.</p>
+        </div>
+
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="p-4 rounded-4 h-100" style="background: #FFF8F6;">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3 text-danger fs-2 fw-bold" style="width: 70px; height: 70px; background: var(--lh-accent-soft);">
+                        1
+                    </div>
+                    <h5 class="fw-bold mb-2 font-heading text-dark">Find Items Near You</h5>
+                    <p class="text-muted mb-0">Search pickles, cakes, blouse stitching, or tutors in your area or pincode.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 rounded-4 h-100" style="background: #F0F4FF;">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3 text-primary fs-2 fw-bold" style="width: 70px; height: 70px; background: #EEF2FF;">
+                        2
+                    </div>
+                    <h5 class="fw-bold mb-2 font-heading text-dark">Send Order Request</h5>
+                    <p class="text-muted mb-0">Add to cart and send order requests directly to the seller with a tap.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 rounded-4 h-100" style="background: #F0FDF4;">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3 text-success fs-2 fw-bold" style="width: 70px; height: 70px; background: #ECFDF5;">
+                        3
+                    </div>
+                    <h5 class="fw-bold mb-2 font-heading text-dark">Connect & Call Seller</h5>
+                    <p class="text-muted mb-0">Call the local seller directly on their phone number for pickup, delivery & custom requests.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Popular Categories Section -->
+<section class="py-5">
+    <div class="container py-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h2 class="fw-bold mb-1 font-heading text-dark">Browse Categories</h2>
+                <p class="text-muted mb-0">Pick a category to see products from local women near you</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            {% for cat in categories %}
+            <div class="col-lg-3 col-md-4 col-6">
+                <a href="{% url 'login' %}?next={% url 'marketplace' %}?category={{ cat.slug }}" class="text-decoration-none">
+                    <div class="lh-card category-card p-4 text-center h-100 bg-white">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px; background: var(--lh-accent-soft); color: var(--lh-accent);">
+                            <i class="fa-solid {{ cat.icon_class }} fs-3"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1 font-heading">{{ cat.name }}</h5>
+                        <p class="small text-muted mb-0">{{ cat.description|truncatewords:6 }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

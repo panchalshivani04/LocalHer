@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results for "{{ query }}" — LocalHer{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="mb-4">
+        <h3 class="fw-bold font-heading mb-1">Search Results for "<span class="text-danger">{{ query }}</span>"</h3>
+        <p class="text-muted small">Matching products, services, and local seller businesses</p>
+    </div>
+
+    <!-- Businesses Search Results -->
+    {% if sellers %}
+    <div class="mb-5">
+        <h5 class="fw-bold mb-3 font-heading text-primary"><i class="fa-solid fa-store me-2"></i> Matching Local Businesses</h5>
+        <div class="row g-4">
+            {% for seller in sellers %}
+            <div class="col-md-6 col-lg-4">
+                <div class="lh-card p-3 d-flex align-items-center gap-3">
+                    <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 54px; height: 54px; background: var(--lh-accent); flex-shrink: 0;">
+                        {{ seller.business_name|first|upper }}
+                    </div>
+                    <div class="overflow-hidden flex-grow-1">
+                        <h6 class="fw-bold mb-0 text-truncate">
+                            <a href="{% url 'seller_profile' seller.slug %}" class="text-dark text-decoration-none">{{ seller.business_name }}</a>
+                        </h6>
+                        <span class="small text-muted d-block"><i class="fa-solid fa-location-dot me-1"></i> {{ seller.area }}, {{ seller.city }}</span>
+                        <a href="{% url 'seller_profile' seller.slug %}" class="btn btn-sm btn-outline-danger mt-2 py-0 px-2 style='font-size: 0.75rem;'">View Business Storefront</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Products Search Results -->
+    <div>
+        <h5 class="fw-bold mb-3 font-heading text-dark"><i class="fa-solid fa-box-open me-2"></i> Matching Products & Services</h5>
+        <div class="row g-4">
+            {% for product in products %}
+            <div class="col-md-6 col-lg-3">
+                <div class="lh-card h-100 d-flex flex-column">
+                    <div class="position-relative bg-light text-center" style="height: 180px; overflow: hidden;">
+                        {% if product.primary_image %}
+                        <img src="{{ product.primary_image.url }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ product.title }}">
+                        {% else %}
+                        <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                            <i class="fa-solid fa-image fs-1 opacity-25"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="p-3 d-flex flex-column flex-grow-1">
+                        <span class="badge-category mb-1 align-self-start">{{ product.category.name }}</span>
+                        <h6 class="fw-bold text-dark mb-1 text-truncate">
+                            <a href="{% url 'product_detail' product.slug %}" class="text-dark text-decoration-none">{{ product.title }}</a>
+                        </h6>
+                        <p class="small text-muted mb-2">By {{ product.seller.business_name }}</p>
+                        <div class="mt-auto pt-2 d-flex align-items-center justify-content-between border-top">
+                            <span class="fw-bold fs-5 text-dark">₹{{ product.price }}</span>
+                            <a href="{% url 'add_to_cart' product.id %}" class="btn btn-sm btn-lh-accent">Add</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            {% if not sellers %}
+            <div class="col-12 text-center py-5">
+                <i class="fa-solid fa-magnifying-glass-minus fs-1 text-muted opacity-50 mb-3"></i>
+                <h5>No results found for "{{ query }}"</h5>
+                <p class="text-muted small">Try searching with a different keyword like "pickle", "blouse", "cake", or a city name.</p>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

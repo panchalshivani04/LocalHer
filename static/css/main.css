@@ -1,0 +1,360 @@
+/* LocalHer Custom Design System — Clean, Spacious & Household Friendly */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --lh-primary: #1E1B4B;
+    --lh-primary-light: #312E81;
+    --lh-accent: #E05A47;
+    --lh-accent-hover: #C84B38;
+    --lh-accent-soft: #FFF2F0;
+    --lh-amber: #F59E0B;
+    --lh-emerald: #10B981;
+    --lh-whatsapp: #25D366;
+    --lh-bg: #FAFAF7;
+    --lh-surface: #FFFFFF;
+    --lh-text-dark: #1F2937;
+    --lh-text-muted: #6B7280;
+    --lh-border: #E5E7EB;
+    --lh-shadow-sm: 0 2px 8px rgba(0,0,0,0.03);
+    --lh-shadow-md: 0 6px 16px rgba(30,27,75,0.06);
+    --lh-shadow-lg: 0 12px 30px rgba(30,27,75,0.1);
+    --lh-radius: 14px;
+    --lh-radius-lg: 20px;
+    --lh-transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--lh-bg);
+    color: var(--lh-text-dark);
+    font-size: 1.02rem;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--lh-primary);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* Custom Spacious Navbar */
+.navbar-localher {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+    padding: 1rem 1.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    box-shadow: var(--lh-shadow-sm);
+}
+
+.navbar-brand-logo {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    color: var(--lh-primary);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.navbar-brand-logo .brand-text {
+    color: var(--lh-primary);
+}
+
+.navbar-brand-logo .brand-text span {
+    color: var(--lh-accent);
+}
+
+.brand-badge {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    background: var(--lh-accent-soft);
+    color: var(--lh-accent);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Role Switcher Pill — Very Clear & Friendly */
+.role-switcher {
+    background: #F3F4F6;
+    border-radius: 35px;
+    padding: 5px;
+    display: inline-flex;
+    align-items: center;
+    border: 1.5px solid var(--lh-border);
+}
+
+.role-switcher .btn-mode {
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--lh-text-muted);
+    transition: var(--lh-transition);
+}
+
+.role-switcher .btn-mode.active {
+    background: var(--lh-primary);
+    color: #FFFFFF;
+    box-shadow: 0 3px 8px rgba(30,27,75,0.25);
+}
+
+.role-switcher .btn-mode.seller-active {
+    background: var(--lh-accent);
+    color: #FFFFFF;
+    box-shadow: 0 3px 8px rgba(224,90,71,0.35);
+}
+
+/* Custom Buttons — Large & Tactile */
+.btn-lh-primary {
+    background-color: var(--lh-primary);
+    color: #FFFFFF;
+    border: none;
+    border-radius: var(--lh-radius);
+    padding: 0.75rem 1.6rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: var(--lh-transition);
+}
+
+.btn-lh-primary:hover {
+    background-color: var(--lh-primary-light);
+    color: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: var(--lh-shadow-md);
+}
+
+.btn-lh-accent {
+    background-color: var(--lh-accent);
+    color: #FFFFFF;
+    border: none;
+    border-radius: var(--lh-radius);
+    padding: 0.75rem 1.6rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: var(--lh-transition);
+}
+
+.btn-lh-accent:hover {
+    background-color: var(--lh-accent-hover);
+    color: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(224,90,71,0.3);
+}
+
+.btn-lh-outline {
+    background: transparent;
+    color: var(--lh-primary);
+    border: 2px solid var(--lh-primary);
+    border-radius: var(--lh-radius);
+    padding: 0.7rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: var(--lh-transition);
+}
+
+.btn-lh-outline:hover {
+    background-color: var(--lh-primary);
+    color: #FFFFFF;
+}
+
+.btn-whatsapp {
+    background-color: var(--lh-whatsapp);
+    color: #FFFFFF;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--lh-radius);
+    padding: 0.75rem 1.5rem;
+    transition: var(--lh-transition);
+}
+
+.btn-whatsapp:hover {
+    background-color: #20BA5A;
+    color: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37,211,102,0.3);
+}
+
+/* Cards & Surface Components — Generous Padding & Space */
+.lh-card {
+    background: var(--lh-surface);
+    border-radius: var(--lh-radius-lg);
+    border: 1px solid rgba(229, 231, 235, 0.8);
+    box-shadow: var(--lh-shadow-sm);
+    transition: var(--lh-transition);
+    overflow: hidden;
+}
+
+.lh-card:hover {
+    box-shadow: var(--lh-shadow-md);
+    transform: translateY(-3px);
+}
+
+/* Form Inputs — Large & Friendly */
+.form-control, .form-select {
+    padding: 0.75rem 1.1rem;
+    font-size: 1rem;
+    border-radius: 12px;
+    border: 1.5px solid var(--lh-border);
+    transition: var(--lh-transition);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--lh-accent);
+    box-shadow: 0 0 0 4px rgba(224,90,71,0.12);
+}
+
+/* Badges */
+.badge-category {
+    background-color: #F3F4F6;
+    color: var(--lh-primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+.badge-service {
+    background-color: #ECFDF5;
+    color: #047857;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+.badge-product {
+    background-color: #FEF3C7;
+    color: #B45309;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+/* Footer */
+footer.lh-footer {
+    margin-top: auto;
+    background-color: var(--lh-primary);
+    color: #9CA3AF;
+    padding: 4rem 0 2rem;
+}
+
+footer.lh-footer h5 {
+    color: #FFFFFF;
+    font-weight: 700;
+    margin-bottom: 1.4rem;
+}
+
+footer.lh-footer a {
+    color: #D1D5DB;
+    text-decoration: none;
+    transition: var(--lh-transition);
+}
+
+footer.lh-footer a:hover {
+    color: var(--lh-accent);
+}
+
+/* Toast Messages */
+.messages-container {
+    position: fixed;
+    top: 90px;
+    right: 24px;
+    z-index: 1060;
+    max-width: 400px;
+}
+
+/* Metric & Category Theme Cards */
+.metric-card-indigo, .metric-card-amber, .metric-card-emerald, .metric-card-coral {
+    background: var(--lh-surface);
+    border: 1px solid var(--lh-border);
+}
+
+/* Category Hover Cards with Accent Borders */
+.category-card {
+    border-top: 3.5px solid transparent;
+    transition: var(--lh-transition);
+}
+
+.category-card:hover {
+    border-top-color: var(--lh-accent);
+    box-shadow: 0 10px 25px rgba(224, 90, 71, 0.15);
+    transform: translateY(-4px);
+}
+
+/* Product Card Enhancements */
+.lh-product-card {
+    background: var(--lh-surface);
+    border: 1px solid var(--lh-border);
+    transition: var(--lh-transition);
+}
+
+.lh-product-card:hover {
+    border-color: rgba(30, 27, 75, 0.2);
+    box-shadow: var(--lh-shadow-md);
+    transform: translateY(-3px);
+}
+
+/* Image Zoom on Product Cards */
+.img-zoom-container {
+    overflow: hidden;
+    position: relative;
+}
+
+.img-zoom-container img {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lh-product-card:hover .img-zoom-container img {
+    transform: scale(1.06);
+}
+
+.seller-avatar-sm {
+    width: 26px;
+    height: 26px;
+    background: var(--lh-primary);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Clean Light Nav Pills Theme */
+.nav-pills .nav-link {
+    color: var(--lh-text-muted);
+    border-radius: 12px;
+    background-color: transparent;
+    border: 1.5px solid transparent;
+    transition: var(--lh-transition);
+}
+
+.nav-pills .nav-link.active {
+    background-color: #FFF2F0 !important;
+    color: #E05A47 !important;
+    border-color: #FCA5A5 !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+}
+
+.nav-pills .nav-link:hover:not(.active) {
+    background-color: #F9FAFB;
+    color: var(--lh-text-dark);
+}
+
+
+

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout & Submit Order Request — LocalHer{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-5">
+        <div class="col-lg-7">
+            <div class="lh-card p-4 p-md-5">
+                <h4 class="fw-bold font-heading mb-4"><i class="fa-solid fa-paper-plane text-danger me-2"></i> Submit Order Request</h4>
+                
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold small">Delivery Address / Local Pickup Location *</label>
+                        <textarea name="delivery_address" class="form-control" rows="3" placeholder="Enter your full street address, flat number, and landmark..." required>{{ user.area }}, {{ user.city }} ({{ user.pincode }})</textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold small">Contact Phone Number (For Seller Order Confirmation) *</label>
+                        <input type="text" name="contact_phone" class="form-control" placeholder="10-digit mobile number" value="{{ user.phone_number }}" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold small">Customization / Order Notes (Optional)</label>
+                        <textarea name="notes" class="form-control" rows="3" placeholder="Special spice preference for pickles, preferred time for service, blouse measurements..."></textarea>
+                    </div>
+
+                    <div class="alert alert-info border-0 small mb-4">
+                        <i class="fa-solid fa-circle-info me-1"></i> <strong>No Online Payment Required Now:</strong> Submitting this request sends your order directly to the seller's dashboard. You can confirm delivery/payment terms directly via call or WhatsApp.
+                    </div>
+
+                    <button type="submit" class="btn btn-lh-accent btn-lg w-100 py-3 fw-semibold fs-6">
+                        <i class="fa-solid fa-check-circle me-2"></i> Send Order Request to Seller
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="lh-card p-4">
+                <h5 class="fw-bold mb-3 font-heading">Items in your Order</h5>
+                <ul class="list-group list-group-flush mb-3">
+                    {% for item in cart_items %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0 bg-transparent">
+                        <div>
+                            <strong class="d-block text-dark">{{ item.product.title }}</strong>
+                            <span class="small text-muted">Qty: {{ item.quantity }} × ₹{{ item.product.price }}</span>
+                        </div>
+                        <span class="fw-bold text-dark">₹{{ item.total_price }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="d-flex justify-content-between pt-3 border-top">
+                    <strong class="fs-5">Total Order Value</strong>
+                    <strong class="fs-4 text-danger">₹{{ total_amount }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

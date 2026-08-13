@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.title }} — LocalHer{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-5">
+        <!-- Product Image Gallery -->
+        <div class="col-lg-6">
+            <div class="lh-card p-3 mb-3 bg-light text-center" style="max-height: 440px; overflow: hidden;">
+                {% if product.primary_image %}
+                <img src="{{ product.primary_image.url }}" class="img-fluid rounded-3" style="max-height: 400px; object-fit: contain;" alt="{{ product.title }}">
+                {% else %}
+                <div class="py-5 text-muted">
+                    <i class="fa-solid fa-image fs-1 opacity-25"></i>
+                    <p class="mt-2 small">No image uploaded for this listing</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if product.images.count > 1 %}
+            <div class="d-flex gap-2 overflow-x-auto pb-2">
+                {% for img in product.images.all %}
+                <img src="{{ img.image.url }}" class="rounded border" style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;" alt="Thumbnail">
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Product Specs & Actions -->
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <span class="badge-category">{{ product.category.name }}</span>
+                <span class="badge {% if product.product_type == 'SERVICE' %}badge-service{% else %}badge-product{% endif %} ms-2">
+                    {{ product.get_product_type_display }}
+                </span>
+            </div>
+
+            <h2 class="fw-bold mb-2 font-heading">{{ product.title }}</h2>
+
+            <!-- Rating Summary -->
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="text-warning">
+                    <i class="fa-solid fa-star"></i>
+                    <span class="fw-bold text-dark me-1">{{ product.average_rating }}</span>
+                </div>
+                <span class="text-muted small">({{ product.total_reviews }} customer reviews)</span>
+            </div>
+
+            <!-- Price -->
+            <div class="mb-4 p-3 rounded-3" style="background: var(--lh-accent-soft); display: inline-block;">
+                <span class="fs-2 fw-bold text-danger">₹{{ product.price }}</span>
+                <span class="text-muted small ms-1">/ {{ product.price_unit }}</span>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+                <h6 class="fw-bold text-muted text-uppercase fs-7 mb-2">Description & Details</h6>
+                <p class="text-dark leading-relaxed">{{ product.description|linebreaks }}</p>
+            </div>
+
+            <!-- Direct Seller Contact Phone Section -->
+            <div class="mb-4 p-3 rounded-3 bg-light border d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;">
+                        <i class="fa-solid fa-phone fs-5"></i>
+                    </div>
+                    <div>
+                        <span class="small text-muted d-block text-uppercase fw-bold" style="font-size: 0.75rem;">Seller Direct Contact Phone</span>
+                        <strong class="fs-5 text-dark">+91 {{ product.seller.whatsapp_number|default:product.seller.user.phone_number }}</strong>
+                    </div>
+                </div>
+                <a href="tel:{{ product.seller.whatsapp_number|default:product.seller.user.phone_number }}" class="btn btn-success fw-bold px-4 py-2 rounded-3">
+                    <i class="fa-solid fa-phone me-2"></i> Call Seller Now
+                </a>
+            </div>
+
+            <!-- Quantity & Buying Actions Form -->
+            <form method="POST" action="{% url 'add_to_cart' product.id %}" class="mb-4">
+                {% csrf_token %}
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <label class="fw-bold text-dark small mb-0">Quantity:</label>
+                    <div class="input-group" style="width: 130px;">
+                        <button type="button" class="btn btn-outline-secondary" onclick="let q = document.getElementById('productQty'); if(q.value>1) q.value--;">-</button>
+                        <input type="number" id="productQty" name="quantity" class="form-control text-center fw-bold" value="1" min="1" required>
+                        <button type="button" class="btn btn-outline-secondary" onclick="let q = document.getElementById('productQty'); q.value++;">+</button>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-3">
+                    <button type="submit" class="btn btn-lh-accent btn-lg px-4 fs-6 fw-bold">
+                        <i class="fa-solid fa-cart-plus me-2"></i> Add to Cart
+                    </button>
+                    
+                    <button type="submit" name="buy_now" value="true" class="btn btn-lh-primary btn-lg px-4 fs-6 fw-bold">
+                        <i class="fa-solid fa-bolt me-2"></i> Request Order Now
+                    </button>
+
+                    <a href="{% url 'toggle_favorite' product.id %}" class="btn btn-lh-outline btn-lg px-3 fs-6" title="Save Item">
+                        <i class="fa-regular fa-heart text-danger"></i>
+                    </a>
+                </div>
+            </form>
+
+            <hr class="my-4">
+
+            <!-- Seller Storefront Card -->
+            <div class="lh-card p-3 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 50px; height: 50px; background: var(--lh-primary);">
+                        {{ product.seller.business_name|first|upper }}
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-dark">{{ product.seller.business_name }}</h6>
+                        <span class="small text-muted"><i class="fa-solid fa-user me-1"></i> Managed by {{ product.seller.user.get_full_name|default:product.seller.user.username }}</span>
+                    </div>
+                </div>
+                <a href="{% url 'seller_profile' product.seller.slug %}" class="btn btn-sm btn-outline-dark">
+                    View Business Storefront <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Customer Reviews Section -->
+    <div class="row mt-5 pt-4 border-top">
+        <div class="col-lg-8">
+            <h4 class="fw-bold mb-4 font-heading"><i class="fa-solid fa-star text-warning me-2"></i> Customer Reviews & Ratings</h4>
+
+            <!-- Write a Review Form -->
+            {% if user.is_authenticated %}
+            <div class="lh-card p-4 mb-4 bg-light">
+                <h6 class="fw-bold mb-2">Write a Review for {{ product.title }}</h6>
+                <form method="POST" action="{% url 'add_review' product.id %}">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold mb-1">Rating</label>
+                            <select name="rating" class="form-select fw-bold text-warning">
+                                <option value="5" selected>⭐⭐⭐⭐⭐ (5 Stars)</option>
+                                <option value="4">⭐⭐⭐⭐ (4 Stars)</option>
+                                <option value="3">⭐⭐⭐ (3 Stars)</option>
+                                <option value="2">⭐⭐ (2 Stars)</option>
+                                <option value="1">⭐ (1 Star)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold mb-1">Your Feedback Comment</label>
+                            <input type="text" name="comment" class="form-control" placeholder="Share your experience with taste, quality, packaging..." required>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-lh-accent px-4 fw-bold">Submit Review</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+
+            <!-- Existing Reviews List -->
+            {% if reviews %}
+            <div class="d-flex flex-column gap-3">
+                {% for rev in reviews %}
+                <div class="lh-card p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold small" style="width: 32px; height: 32px; background: var(--lh-primary);">
+                                {{ rev.author.first_name|first|default:rev.author.username|first|upper }}
+                            </div>
+                            <strong class="text-dark">{{ rev.author.get_full_name|default:rev.author.username }}</strong>
+                            <span class="badge badge-category" style="font-size: 0.7rem;">Verified Buyer</span>
+                        </div>
+                        <span class="small text-muted">{{ rev.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="text-warning mb-2 fs-6">
+                        {% if rev.rating >= 1 %}<i class="fa-solid fa-star"></i>{% endif %}
+                        {% if rev.rating >= 2 %}<i class="fa-solid fa-star"></i>{% endif %}
+                        {% if rev.rating >= 3 %}<i class="fa-solid fa-star"></i>{% endif %}
+                        {% if rev.rating >= 4 %}<i class="fa-solid fa-star"></i>{% endif %}
+                        {% if rev.rating >= 5 %}<i class="fa-solid fa-star"></i>{% endif %}
+                    </div>
+                    <p class="text-dark mb-0 leading-relaxed">"{{ rev.comment }}"</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-4 bg-light rounded-4 border">
+                <i class="fa-regular fa-star fs-2 text-muted opacity-50 mb-2"></i>
+                <p class="text-muted small mb-0">No reviews yet. Be the first to leave feedback for this product!</p>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}
