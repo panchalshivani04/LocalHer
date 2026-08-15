@@ -1,0 +1,29 @@
+# Python compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environment variables & secrets
+.env
+.env.local
+.venv/
+env/
+venv/
+
+# Django local database backup
+db.sqlite3
+db.sqlite3-journal
+
+# Media & Uploads
+media/
+staticfiles/
+
+# IDE / Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary scratch & test artifacts
+scratch/
