@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Privacy & Security Policy — LocalHer{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 850px;">
+    <div class="lh-card p-4 p-md-5 bg-white border rounded-4 shadow-sm">
+        <h2 class="fw-bold font-heading text-dark mb-4">Privacy & Data Security Policy</h2>
+        
+        <p class="text-muted leading-relaxed mb-4">
+            At LocalHer, your privacy, safety, and confidentiality are our highest priorities. We enforce strict data minimization principles to ensure that customer and seller information is protected at all times.
+        </p>
+
+        <h5 class="fw-bold text-dark mt-4 mb-2">1. Data Minimization</h5>
+        <p class="text-muted leading-relaxed">
+            We collect only essential data required to facilitate local order requests and in-app communication. We do not store unnecessary personal details, voice recordings, or third-party tracking scripts.
+        </p>
+
+        <h5 class="fw-bold text-dark mt-4 mb-2">2. In-App Chat Security</h5>
+        <p class="text-muted leading-relaxed">
+            All chat messages and photo attachments are private between the conversation participants. Media files are stored securely and served only through server-authenticated endpoints. Voice messaging features are completely disabled for data privacy.
+        </p>
+
+        <h5 class="fw-bold text-dark mt-4 mb-2">3. Unsend & Instant Data Deletion</h5>
+        <p class="text-muted leading-relaxed">
+            Users have full control to unsend their messages or delete conversation threads. Deleted messages are removed immediately from the system database and synced real-time.
+        </p>
+
+        <h5 class="fw-bold text-dark mt-4 mb-2">4. User Safety & Moderation</h5>
+        <p class="text-muted leading-relaxed">
+            Users can block or report inappropriate behavior at any time. Reports are reviewed by platform administrators to keep the community safe for local women entrepreneurs and customers.
+        </p>
+
+        <hr class="my-4">
+        <a href="{% url 'marketplace' %}" class="btn btn-lh-accent px-4 py-2 fw-bold">Back to Marketplace</a>
+    </div>
+</div>
+{% endblock %}

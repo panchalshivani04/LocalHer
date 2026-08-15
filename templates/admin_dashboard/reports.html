@@ -1,0 +1,105 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+
+{% block title %}Safety Reports Queue — LocalHer Admin{% endblock %}
+{% block page_heading %}Safety & Moderation Incident Queue{% endblock %}
+
+{% block content %}
+<div class="lh-admin-card">
+    <div class="table-responsive">
+        <table class="table table-lh-admin align-middle">
+            <thead>
+                <tr>
+                    <th>Report ID</th>
+                    <th>Reporter</th>
+                    <th>Reported User</th>
+                    <th>Current Login Status</th>
+                    <th>Reason & Details</th>
+                    <th>Report Status</th>
+                    <th>Moderation Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports %}
+                <tr>
+                    <td class="fw-bold text-dark">#{{ report.id }}</td>
+                    <td>
+                        <div class="fw-semibold text-dark">{{ report.reporter.username }}</div>
+                        <div class="small text-muted">{{ report.created_at|date:"M d, H:i" }}</div>
+                    </td>
+                    <td>
+                        <div class="fw-bold text-danger">{{ report.reported_user.username }}</div>
+                        <div class="small text-muted">{{ report.reported_user.email|default:"No email" }}</div>
+                    </td>
+                    <td>
+                        {% if report.reported_user.is_active %}
+                            <span class="badge bg-success-subtle text-success px-2.5 py-1 rounded-pill fw-semibold">🟢 Active</span>
+                        {% else %}
+                            <span class="badge bg-danger-subtle text-danger px-2.5 py-1 rounded-pill fw-semibold">🔴 Blocked</span>
+                        {% endif %}
+                    </td>
+                    <td style="max-width: 280px;">
+                        <span class="badge bg-danger-subtle text-danger px-2.5 py-1 rounded-pill mb-1 d-inline-block">{{ report.get_reason_display }}</span>
+                        <div class="small text-muted leading-relaxed">{{ report.description|default:"No description provided." }}</div>
+                    </td>
+                    <td>
+                        {% if report.status == 'PENDING' %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1.5 rounded-pill fw-semibold">PENDING</span>
+                        {% elif report.status == 'UNDER_REVIEW' %}
+                            <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-1.5 rounded-pill fw-semibold">UNDER REVIEW</span>
+                        {% elif report.status == 'RESOLVED' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill fw-semibold">RESOLVED</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary border px-3 py-1.5 rounded-pill fw-semibold">DISMISSED</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-lh-accent rounded-pill px-3 py-1.5 fw-semibold dropdown-toggle" data-bs-toggle="dropdown">
+                                Moderate <i class="fa-solid fa-chevron-down ms-1 small"></i>
+                            </button>
+                            <ul class="dropdown-menu shadow border-0 rounded-3">
+                                <li>
+                                    <form method="POST" action="{% url 'admin_dashboard:moderate_report' report.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="UNDER_REVIEW">
+                                        <button type="submit" class="dropdown-item fw-semibold text-info"><i class="fa-solid fa-eye me-2"></i> Mark Under Review</button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form method="POST" action="{% url 'admin_dashboard:moderate_report' report.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="SUSPEND">
+                                        <button type="submit" class="dropdown-item fw-semibold text-warning" onclick="return confirm('Suspend reported user {{ report.reported_user.username }}?');"><i class="fa-solid fa-pause me-2"></i> Suspend User</button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form method="POST" action="{% url 'admin_dashboard:moderate_report' report.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="BLOCK">
+                                        <button type="submit" class="dropdown-item fw-semibold text-danger" onclick="return confirm('Permanently block {{ report.reported_user.username }} from login?');"><i class="fa-solid fa-ban me-2"></i> Permanently Block User</button>
+                                    </form>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="POST" action="{% url 'admin_dashboard:moderate_report' report.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="DISMISS">
+                                        <button type="submit" class="dropdown-item text-secondary"><i class="fa-solid fa-xmark me-2"></i> Dismiss Report</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted small">
+                        No incident reports submitted yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

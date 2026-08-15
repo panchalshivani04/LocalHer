@@ -173,8 +173,8 @@
                                 <th>Customer Name</th>
                                 <th>Items Requested</th>
                                 <th>Total</th>
-                                <th>Status</th>
-                                <th>Direct Contact</th>
+                                <th>Status Actions</th>
+                                <th>Chat Thread</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -183,7 +183,7 @@
                                 <td class="fw-bold text-dark">#{{ order.id }}</td>
                                 <td>
                                     <strong class="fs-6 text-dark d-block">{{ order.customer.get_full_name|default:order.customer.username }}</strong>
-                                    <span class="small text-muted"><i class="fa-solid fa-phone me-1"></i> {{ order.contact_phone }}</span>
+                                    <span class="small text-muted"><i class="fa-solid fa-user me-1"></i> Customer</span>
                                 </td>
                                 <td>
                                     <ul class="list-unstyled mb-0 small">
@@ -194,19 +194,53 @@
                                 </td>
                                 <td class="fw-extrabold text-danger fs-5">₹{{ order.total_amount }}</td>
                                 <td>
-                                    <form method="POST" action="{% url 'seller_order_status' order.id %}">
-                                        {% csrf_token %}
-                                        <select name="status" class="form-select form-select-sm fw-semibold" onchange="this.form.submit()" style="min-width: 140px;">
-                                            <option value="PENDING" {% if order.status == 'PENDING' %}selected{% endif %}>Pending</option>
-                                            <option value="ACCEPTED" {% if order.status == 'ACCEPTED' %}selected{% endif %}>Accepted</option>
-                                            <option value="FULFILLED" {% if order.status == 'FULFILLED' %}selected{% endif %}>Fulfilled</option>
-                                            <option value="CANCELLED" {% if order.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
-                                        </select>
-                                    </form>
+                                    {% if order.status == 'PENDING' %}
+                                    <div class="d-flex align-items-center gap-1">
+                                        <form method="POST" action="{% url 'seller_order_status' order.id %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="status" value="ACCEPTED">
+                                            <button type="submit" class="btn btn-sm btn-primary fw-bold px-3">
+                                                <i class="fa-solid fa-check me-1"></i> Accept Order
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{% url 'seller_order_status' order.id %}" onsubmit="return confirm('Cancel this order request?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="status" value="CANCELLED">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold px-2">
+                                                Cancel
+                                            </button>
+                                        </form>
+                                    </div>
+                                    {% elif order.status == 'ACCEPTED' %}
+                                    <div class="d-flex align-items-center gap-1">
+                                        <form method="POST" action="{% url 'seller_order_status' order.id %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="status" value="FULFILLED">
+                                            <button type="submit" class="btn btn-sm btn-success fw-bold px-3">
+                                                <i class="fa-solid fa-box-open me-1"></i> Mark Fulfilled
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{% url 'seller_order_status' order.id %}" onsubmit="return confirm('Cancel this accepted order?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="status" value="CANCELLED">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold px-2">
+                                                Cancel
+                                            </button>
+                                        </form>
+                                    </div>
+                                    {% elif order.status == 'FULFILLED' %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fw-bold fs-7">
+                                        <i class="fa-solid fa-circle-check me-1"></i> Completed & Fulfilled
+                                    </span>
+                                    {% elif order.status == 'CANCELLED' %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 fw-bold fs-7">
+                                        <i class="fa-solid fa-circle-xmark me-1"></i> Order Cancelled
+                                    </span>
+                                    {% endif %}
                                 </td>
                                 <td>
-                                    <a href="tel:{{ order.contact_phone }}" class="btn btn-success btn-sm px-3 py-2 fw-bold">
-                                        <i class="fa-solid fa-phone me-1"></i> Call Customer
+                                    <a href="{% url 'inbox' %}" class="btn rounded-pill px-3 py-2 fw-bold text-white shadow-sm d-inline-flex align-items-center gap-1" style="background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%); border: none; font-size: 0.82rem;" title="Open Chat Thread">
+                                        <i class="fa-solid fa-comments text-warning"></i> Message Customer
                                     </a>
                                 </td>
                             </tr>

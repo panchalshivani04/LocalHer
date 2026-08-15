@@ -1,0 +1,87 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+
+{% block title %}Blocked Accounts Directory — LocalHer Admin{% endblock %}
+{% block page_heading %}Blocked & Suspended User Directory{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Platform Deactivated Users -->
+    <div class="col-lg-7">
+        <div class="lh-admin-card">
+            <div class="p-3.5 px-4 bg-light border-bottom">
+                <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-user-slash text-danger me-2"></i>Login-Disabled / Suspended Users ({{ inactive_users|length }})</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-lh-admin align-middle">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Date Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in inactive_users %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-dark mb-0">{{ u.username }}</div>
+                                <div class="small text-muted">{{ u.email|default:"No email" }}</div>
+                            </td>
+                            <td>
+                                {% if u.is_seller %}
+                                    <span class="badge bg-danger-subtle text-danger px-2.5 py-1 rounded-pill">Seller</span>
+                                {% else %}
+                                    <span class="badge bg-secondary-subtle text-secondary px-2.5 py-1 rounded-pill">Customer</span>
+                                {% endif %}
+                            </td>
+                            <td class="small text-muted">{{ u.date_joined|date:"M d, Y" }}</td>
+                            <td>
+                                <form method="POST" action="{% url 'admin_dashboard:toggle_user_status' u.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 py-1 fw-semibold small">
+                                        <i class="fa-solid fa-check me-1"></i> Restore Access
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted small">
+                                <i class="fa-solid fa-circle-check text-success fs-4 d-block mb-2"></i>
+                                No login-disabled or suspended accounts found.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Peer-to-Peer Block Pairs -->
+    <div class="col-lg-5">
+        <div class="lh-admin-card">
+            <div class="p-3.5 px-4 bg-light border-bottom">
+                <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-shield text-warning me-2"></i>User-Initiated Block Controls ({{ user_blocks|length }})</h6>
+            </div>
+            <div class="p-3">
+                <div class="d-flex flex-column gap-2.5">
+                    {% for block in user_blocks %}
+                    <div class="p-3 rounded-3 bg-light border">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="fw-bold text-dark">{{ block.blocker.username }}</span>
+                            <span class="badge bg-danger-subtle text-danger px-2 py-0.5 rounded-pill small">Blocked</span>
+                        </div>
+                        <div class="small text-muted mb-1">Blocked User: <strong class="text-danger">{{ block.blocked_user.username }}</strong></div>
+                        <div class="small text-muted" style="font-size: 0.78rem;">Created: {{ block.created_at|date:"M d, Y H:i" }}</div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted small text-center my-3">No user-to-user block entries created.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

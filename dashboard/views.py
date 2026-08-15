@@ -153,10 +153,44 @@ def seller_order_status_view(request, order_id):
 
     if request.method == 'POST':
         new_status = request.POST.get('status')
-        if new_status in dict(Order.STATUS_CHOICES):
+        current_status = order.status
+
+        # Strict Sequential Workflow Checks
+        valid_transition = False
+        if current_status == 'PENDING' and new_status in ['ACCEPTED', 'CANCELLED']:
+            valid_transition = True
+        elif current_status == 'ACCEPTED' and new_status in ['FULFILLED', 'CANCELLED']:
+            valid_transition = True
+
+        if valid_transition:
             order.status = new_status
             order.save()
             messages.success(request, f"Updated Order #{order.id} status to {order.get_status_display()}.")
+
+            # Automatically notify Customer in Chat thread
+            try:
+                from chat.models import Conversation, Message
+                conv, _ = Conversation.objects.get_or_create(customer=order.customer, seller=seller)
+                
+                if new_status == 'ACCEPTED':
+                    status_text = f"✅ ORDER #{order.id} ACCEPTED!\nThe seller has accepted your order request."
+                elif new_status == 'FULFILLED':
+                    status_text = f"🎉 ORDER #{order.id} COMPLETED & FULFILLED!\nYour order is fulfilled. Please leave a review to support the seller!"
+                elif new_status == 'CANCELLED':
+                    status_text = f"❌ ORDER #{order.id} CANCELLED\nThe order request has been cancelled by the seller."
+                else:
+                    status_text = f"ℹ️ ORDER #{order.id} Status Updated: {order.get_status_display()}"
+
+                Message.objects.create(
+                    conversation=conv,
+                    sender=request.user,
+                    content=status_text
+                )
+                conv.save()
+            except Exception:
+                pass
+        else:
+            messages.warning(request, f"Invalid status transition for Order #{order.id}.")
 
     return redirect('seller_dashboard')
 

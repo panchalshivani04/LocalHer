@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'marketplace',
     'orders',
     'dashboard',
+    'chat',
+    'admin_dashboard',
 ]
 
 # Custom User Model

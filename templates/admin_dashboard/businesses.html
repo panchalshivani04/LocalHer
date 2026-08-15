@@ -1,0 +1,74 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+
+{% block title %}Business Directory Inspector — LocalHer Admin{% endblock %}
+{% block page_heading %}Registered Business Directory{% endblock %}
+
+{% block content %}
+<div class="lh-admin-card p-4 mb-4">
+    <form method="GET" action="" class="row g-3 align-items-center">
+        <div class="col-md-9">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                <input type="text" name="q" value="{{ query }}" class="form-control border-start-0" placeholder="Search by business name, city, area, pincode...">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-lh-accent w-100 fw-semibold">Filter Businesses</button>
+        </div>
+    </form>
+</div>
+
+<div class="row g-4">
+    {% for biz in businesses %}
+    <div class="col-lg-6">
+        <div class="lh-admin-card p-4 h-100 d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex align-items-start justify-content-between mb-3">
+                    <div>
+                        <h5 class="fw-bold text-dark mb-1">{{ biz.business_name }}</h5>
+                        <div class="small text-muted"><i class="fa-solid fa-user me-1"></i> Owner: <strong class="text-dark">{{ biz.user.username }}</strong></div>
+                    </div>
+                    {% if biz.is_verified %}
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill fw-semibold"><i class="fa-solid fa-circle-check me-1"></i> Verified</span>
+                    {% else %}
+                        <span class="badge bg-secondary-subtle text-secondary px-3 py-1.5 rounded-pill fw-semibold">Unverified</span>
+                    {% endif %}
+                </div>
+
+                <p class="small text-muted mb-3 leading-relaxed">
+                    {{ biz.bio|default:"No business description provided."|truncatewords:25 }}
+                </p>
+
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="badge bg-light text-dark border px-2.5 py-1.5 rounded-2"><i class="fa-solid fa-location-dot text-danger me-1"></i> {{ biz.city }}, {{ biz.area }}</span>
+                    <span class="badge bg-light text-dark border px-2.5 py-1.5 rounded-2"><i class="fa-solid fa-hashtag me-1"></i> {{ biz.pincode }}</span>
+                    <span class="badge bg-primary-subtle text-primary px-2.5 py-1.5 rounded-2"><i class="fa-solid fa-box me-1"></i> {{ biz.product_count }} Active Products</span>
+                </div>
+            </div>
+
+            <div class="pt-3 border-top d-flex align-items-center justify-content-between mt-3">
+                <a href="{% url 'seller_profile' biz.slug %}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold">
+                    <i class="fa-solid fa-store me-1"></i> View Storefront
+                </a>
+                
+                <form method="POST" action="{% url 'admin_dashboard:toggle_seller_verification' biz.id %}" class="d-inline">
+                    {% csrf_token %}
+                    {% if biz.is_verified %}
+                        <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-semibold">Unverify</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 fw-semibold">Verify Business ✅</button>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="lh-admin-card p-5 text-center text-muted">
+            <i class="fa-solid fa-building-circle-xmark fs-1 d-block mb-3 text-secondary"></i>
+            No business profiles found matching your search query.
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

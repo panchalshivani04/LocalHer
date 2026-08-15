@@ -170,3 +170,24 @@ def add_review_view(request, product_id):
         return redirect(next_url)
     return redirect('customer_orders')
 
+
+def privacy_policy_view(request):
+    """
+    Renders Privacy Policy page detailing data minimization & protection.
+    """
+    return render(request, 'privacy_policy.html')
+
+
+def terms_view(request):
+    """
+    Renders Terms of Service page.
+    """
+    return render(request, 'terms.html')
+
+
+def safety_view(request):
+    """
+    Renders Safety & Moderation Guidelines page.
+    """
+    return render(request, 'safety.html')
+

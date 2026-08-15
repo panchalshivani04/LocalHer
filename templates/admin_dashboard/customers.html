@@ -1,0 +1,101 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+
+{% block title %}Customers Directory — LocalHer Admin{% endblock %}
+{% block page_heading %}Customer Account Management{% endblock %}
+
+{% block content %}
+<div class="lh-admin-card p-4 mb-4">
+    <form method="GET" action="" class="row g-3 align-items-center">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                <input type="text" name="q" value="{{ query }}" class="form-control border-start-0" placeholder="Search by username, name, email, city...">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select name="status" class="form-select">
+                <option value="">All Accounts</option>
+                <option value="active" {% if status_filter == 'active' %}selected{% endif %}>🟢 Active Only</option>
+                <option value="blocked" {% if status_filter == 'blocked' %}selected{% endif %}>🔴 Blocked / Suspended Only</option>
+                <option value="seller" {% if status_filter == 'seller' %}selected{% endif %}>🏪 Sellers Only</option>
+                <option value="customer" {% if status_filter == 'customer' %}selected{% endif %}>👤 Customers Only</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-lh-accent w-100 fw-semibold">Filter</button>
+        </div>
+    </form>
+</div>
+
+<div class="lh-admin-card">
+    <div class="table-responsive">
+        <table class="table table-lh-admin align-middle">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Phone</th>
+                    <th>Location</th>
+                    <th>Joined Date</th>
+                    <th>Login Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2.5">
+                            <div class="rounded-circle bg-danger-subtle text-danger fw-bold d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-size: 0.85rem;">
+                                {{ customer.username|slice:":1"|upper }}
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark mb-0">{{ customer.username }}</div>
+                                <div class="small text-muted">{{ customer.email|default:"No email set" }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if customer.is_seller %}
+                            <span class="badge bg-danger-subtle text-danger px-2.5 py-1 rounded-pill"><i class="fa-solid fa-store me-1"></i> Seller</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary px-2.5 py-1 rounded-pill"><i class="fa-solid fa-user me-1"></i> Customer</span>
+                        {% endif %}
+                    </td>
+                    <td class="small">{{ customer.phone_number|default:"—" }}</td>
+                    <td class="small">{{ customer.city|default:"Local" }}{% if customer.area %}, {{ customer.area }}{% endif %}</td>
+                    <td class="small text-muted">{{ customer.date_joined|date:"M d, Y" }}</td>
+                    <td>
+                        {% if customer.is_active %}
+                            <span class="badge bg-success-subtle text-success px-2.5 py-1 rounded-pill fw-semibold">🟢 Active</span>
+                        {% else %}
+                            <span class="badge bg-danger-subtle text-danger px-2.5 py-1 rounded-pill fw-semibold">🔴 Blocked</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="POST" action="{% url 'admin_dashboard:toggle_user_status' customer.id %}" class="d-inline">
+                            {% csrf_token %}
+                            {% if customer.is_active %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-semibold small" onclick="return confirm('Are you sure you want to block {{ customer.username }} from logging in?');">
+                                    <i class="fa-solid fa-ban me-1"></i> Block
+                                </button>
+                            {% else %}
+                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 py-1 fw-semibold small">
+                                    <i class="fa-solid fa-check me-1"></i> Restore
+                                </button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted small">
+                        No customer accounts found matching criteria.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

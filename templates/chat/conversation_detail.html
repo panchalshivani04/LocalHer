@@ -1,0 +1,440 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat with {{ other.name }} — LocalHer{% endblock %}
+
+{% block content %}
+<div class="container py-4 pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="lh-card bg-white border-0 shadow-lg rounded-4 overflow-hidden d-flex flex-column" style="min-height: 640px;">
+                
+                <!-- Header Bar with Safety Options Menu -->
+                <div class="p-3 px-md-4 text-white d-flex align-items-center justify-content-between shadow-sm" style="background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%);">
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="{% url 'inbox' %}" class="btn btn-sm btn-outline-light rounded-circle p-2 border-0 opacity-85 hover-opacity-100" title="Back to Inbox">
+                            <i class="fa-solid fa-arrow-left fs-5"></i>
+                        </a>
+
+                        <div class="rounded-circle bg-white text-danger d-flex align-items-center justify-content-center fw-bold fs-5 flex-shrink-0 shadow-sm" style="width: 46px; height: 46px;">
+                            {{ other.avatar_letter }}
+                        </div>
+
+                        <div>
+                            <h6 class="fw-bold text-white mb-0 font-heading d-flex align-items-center gap-2">
+                                {{ other.name }}
+                                {% if is_blocked %}
+                                <span class="badge bg-secondary-subtle text-secondary px-2 py-1 rounded-pill" style="font-size: 0.65rem;">Unavailable</span>
+                                {% else %}
+                                <span class="badge px-2 py-1 rounded-pill" style="font-size: 0.65rem; background: rgba(34, 197, 94, 0.2); color: #4ADE80; border: 1px solid rgba(34, 197, 94, 0.4);">🟢 Active Now</span>
+                                {% endif %}
+                            </h6>
+                            <span class="small text-light opacity-75 d-block" style="font-size: 0.75rem;">{{ other.subtext }}</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        {% if other.is_seller %}
+                        <a href="{{ other.url }}" class="btn btn-sm btn-outline-light rounded-pill px-3 fw-semibold">
+                            View Store <i class="fa-solid fa-store ms-1"></i>
+                        </a>
+                        {% endif %}
+
+                        <!-- Safety Options Menu (⋮) -->
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-light rounded-circle p-2 border-0" type="button" data-bs-toggle="dropdown" title="Safety Options">
+                                <i class="fa-solid fa-ellipsis-vertical fs-5"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" style="border-radius: 12px; min-width: 200px;">
+                                {% if other.is_seller %}
+                                <li>
+                                    <a href="{{ other.url }}" class="dropdown-item py-2 fw-semibold">
+                                        <i class="fa-solid fa-store me-2 text-primary"></i> View Seller Profile
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li>
+                                    <button type="button" class="dropdown-item py-2 fw-semibold" onclick="toggleBlockUser({{ other.user.id }})">
+                                        <i class="fa-solid fa-ban me-2 text-warning"></i>
+                                        <span id="blockMenuText">{% if user_has_blocked_other %}Unblock User{% else %}Block User{% endif %}</span>
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item py-2 text-danger fw-semibold" data-bs-toggle="modal" data-bs-target="#reportModal">
+                                        <i class="fa-solid fa-flag me-2"></i> Report User
+                                    </button>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="POST" action="{% url 'delete_conversation' conversation.id %}" onsubmit="return confirm('Are you sure you want to delete this conversation thread?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item py-2 text-secondary fw-semibold">
+                                            <i class="fa-solid fa-trash-can me-2"></i> Delete Conversation
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Neutral Block Banner -->
+                {% if is_blocked %}
+                <div class="p-3 bg-secondary-subtle border-bottom text-center text-muted small fw-semibold">
+                    <i class="fa-solid fa-lock me-2"></i> Messaging is currently unavailable for this conversation.
+                </div>
+                {% endif %}
+
+                <!-- Messages Window -->
+                <div id="chatMessagesBox" class="p-3 p-md-4 flex-grow-1 overflow-y-auto d-flex flex-column gap-3" style="max-height: 500px; min-height: 400px; background: #F8FAFC;">
+                    {% for msg in chat_messages %}
+                    <div class="d-flex flex-column {% if msg.sender == user %}align-items-end{% else %}align-items-start{% endif %} msg-item" data-msg-id="{{ msg.id }}">
+                        <div class="d-flex align-items-center gap-2 mb-1 px-1">
+                            <span class="small text-muted" style="font-size: 0.7rem; font-weight: 600;">
+                                {% if msg.sender == user %}You{% else %}{{ msg.sender.get_full_name|default:msg.sender.username }}{% endif %}
+                            </span>
+                            <span class="small text-muted" style="font-size: 0.68rem;">{{ msg.timestamp|date:"h:i A" }}</span>
+                            {% if msg.sender == user %}
+                            <button type="button" class="btn btn-link text-muted p-0 text-decoration-none ms-1 unsend-btn" onclick="unsendMessage({{ msg.id }})" title="Unsend Message" style="font-size: 0.75rem;">
+                                <i class="fa-solid fa-trash-can opacity-50 hover-opacity-100"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="p-3 shadow-sm max-w-lg text-break" style="{% if msg.sender == user %}background: linear-gradient(135deg, #312E81 0%, #4338CA 100%); color: #ffffff; border-radius: 18px 18px 4px 18px;{% else %}background: #ffffff; color: var(--lh-text-dark); border: 1px solid #E5E7EB; border-radius: 18px 18px 18px 4px;{% endif %} font-size: 0.95rem; line-height: 1.5;">
+                            {% if msg.content %}
+                            <div>{{ msg.content|linebreaksbr }}</div>
+                            {% endif %}
+
+                            {% if msg.image %}
+                            <div class="mt-2">
+                                <a href="{% url 'protected_chat_media' msg.id %}" target="_blank">
+                                    <img src="{% url 'protected_chat_media' msg.id %}" class="img-fluid rounded-3 border shadow-sm" style="max-height: 240px; object-fit: cover;" alt="Photo attachment">
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div id="noMessagesPlaceholder" class="text-center py-5 my-auto text-muted">
+                        <div class="rounded-circle bg-white shadow-sm d-inline-flex align-items-center justify-content-center mb-3" style="width: 72px; height: 72px;">
+                            <i class="fa-solid fa-comments fs-2 text-danger opacity-75"></i>
+                        </div>
+                        <p class="mb-1 fw-bold text-dark fs-5 font-heading">Start a Private Conversation</p>
+                        <span class="small text-muted">Inquire about products, custom requests, or pickup timings.</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Media Preview Bar -->
+                <div id="mediaPreviewBar" class="p-2 px-3 bg-light border-top d-none d-flex align-items-center justify-content-between">
+                    <span id="previewText" class="small fw-bold text-dark"></span>
+                    <button type="button" id="cancelMediaBtn" class="btn btn-sm btn-outline-danger rounded-pill px-3">Cancel</button>
+                </div>
+
+                <!-- Chat Input Bar -->
+                <div class="p-3 border-top bg-white">
+                    {% if is_blocked %}
+                    <div class="text-center text-muted py-2 small fw-semibold bg-light rounded-pill">
+                        Messaging is disabled for this conversation.
+                    </div>
+                    {% else %}
+                    <form id="chatForm" method="POST" enctype="multipart/form-data" action="">
+                        {% csrf_token %}
+                        <input type="file" id="imageInput" name="image" accept="image/*" class="d-none">
+
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-light rounded-circle p-2 border flex-shrink-0" style="width: 44px; height: 44px;" onclick="document.getElementById('imageInput').click()" title="Send Photo">
+                                <i class="fa-solid fa-camera text-primary fs-5"></i>
+                            </button>
+
+                            <input type="text" id="chatInput" name="content" class="form-control py-3 px-4 rounded-pill border-light bg-light" placeholder="Write a message..." autocomplete="off">
+                            
+                            <button type="submit" id="sendBtn" class="btn btn-lh-accent rounded-circle p-2 shadow-sm flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 46px; height: 46px;" title="Send Message">
+                                <i class="fa-solid fa-paper-plane fs-5"></i>
+                            </button>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report User Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold font-heading text-dark" id="reportModalLabel">
+                    <i class="fa-solid fa-shield-halved text-danger me-2"></i> Report {{ other.name }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="reportForm">
+                {% csrf_token %}
+                <input type="hidden" name="reported_user_id" value="{{ other.user.id }}">
+                <input type="hidden" name="conversation_id" value="{{ conversation.id }}">
+
+                <div class="modal-body py-3">
+                    <p class="small text-muted mb-3">Your report will be reviewed confidentially by the LocalHer safety team.</p>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-dark">Reason for Report</label>
+                        <select name="reason" class="form-select py-2 rounded-3" required>
+                            {% for key, val in reason_choices %}
+                            <option value="{{ key }}">{{ val }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-dark">Additional Details (Optional)</label>
+                        <textarea name="description" class="form-control rounded-3" rows="3" placeholder="Provide any details to help our moderation team investigate..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Submit Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleBlockUser(targetUserId) {
+        if (!confirm("Toggle personal block status for this user?")) return;
+        const formData = new FormData();
+        formData.append("csrfmiddlewaretoken", document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+        fetch(`/chat/api/block/${targetUserId}/`, {
+            method: "POST",
+            body: formData,
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                window.location.reload();
+            } else if (data.error) {
+                alert(data.error);
+            }
+        })
+        .catch(err => console.error("Error toggling block:", err));
+    }
+
+    function unsendMessage(msgId) {
+        if (!confirm("Are you sure you want to unsend this message?")) return;
+        const formData = new FormData();
+        formData.append("csrfmiddlewaretoken", document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+        fetch(`/chat/api/unsend/${msgId}/`, {
+            method: "POST",
+            body: formData,
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.deleted_id) {
+                const elem = document.querySelector(`[data-msg-id="${data.deleted_id}"]`);
+                if (elem) elem.remove();
+            }
+        })
+        .catch(err => console.error("Error unsending message:", err));
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const chatBox = document.getElementById("chatMessagesBox");
+        const chatForm = document.getElementById("chatForm");
+        const chatInput = document.getElementById("chatInput");
+        const imageInput = document.getElementById("imageInput");
+        const mediaPreviewBar = document.getElementById("mediaPreviewBar");
+        const previewText = document.getElementById("previewText");
+        const cancelMediaBtn = document.getElementById("cancelMediaBtn");
+        const reportForm = document.getElementById("reportForm");
+        const conversationId = {{ conversation.id }};
+
+        let lastMsgId = 0;
+
+        function scrollToBottom() {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        scrollToBottom();
+
+        const msgElements = document.querySelectorAll(".msg-item");
+        if (msgElements.length > 0) {
+            lastMsgId = parseInt(msgElements[msgElements.length - 1].getAttribute("data-msg-id")) || 0;
+        }
+
+        if (cancelMediaBtn) {
+            cancelMediaBtn.addEventListener("click", function() {
+                imageInput.value = "";
+                mediaPreviewBar.classList.add("d-none");
+            });
+        }
+
+        if (imageInput) {
+            imageInput.addEventListener("change", function() {
+                if (this.files && this.files[0]) {
+                    previewText.innerHTML = `<i class="fa-solid fa-image text-primary me-2"></i> Photo selected: ${this.files[0].name}`;
+                    mediaPreviewBar.classList.remove("d-none");
+                }
+            });
+        }
+
+        // Report Form Submission
+        if (reportForm) {
+            reportForm.addEventListener("submit", function(e) {
+                e.preventDefault();
+                const formData = new FormData(reportForm);
+
+                fetch("/chat/api/report/", {
+                    method: "POST",
+                    body: formData,
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        const modalElem = document.getElementById('reportModal');
+                        const modal = bootstrap.Modal.getInstance(modalElem);
+                        if (modal) modal.hide();
+                    } else if (data.error) {
+                        alert(data.error);
+                    }
+                })
+                .catch(err => console.error("Report submit failed:", err));
+            });
+        }
+
+        function appendMessage(msg) {
+            const placeholder = document.getElementById("noMessagesPlaceholder");
+            if (placeholder) placeholder.remove();
+
+            const isSelf = msg.is_self;
+            const msgDiv = document.createElement("div");
+            msgDiv.className = `d-flex flex-column ${isSelf ? 'align-items-end' : 'align-items-start'} msg-item`;
+            msgDiv.setAttribute("data-msg-id", msg.id);
+
+            const metaSpan = document.createElement("div");
+            metaSpan.className = "d-flex align-items-center gap-2 mb-1 px-1";
+            metaSpan.innerHTML = `
+                <span class="small text-muted" style="font-size: 0.7rem; font-weight: 600;">${isSelf ? 'You' : msg.sender_name}</span>
+                <span class="small text-muted" style="font-size: 0.68rem;">${msg.timestamp}</span>
+                ${isSelf ? `<button type="button" class="btn btn-link text-muted p-0 text-decoration-none ms-1 unsend-btn" onclick="unsendMessage(${msg.id})" title="Unsend Message" style="font-size: 0.75rem;"><i class="fa-solid fa-trash-can opacity-50 hover-opacity-100"></i></button>` : ''}
+            `;
+
+            const bubbleDiv = document.createElement("div");
+            bubbleDiv.className = "p-3 shadow-sm max-w-lg text-break";
+            bubbleDiv.style.fontSize = "0.95rem";
+            bubbleDiv.style.lineHeight = "1.5";
+
+            if (isSelf) {
+                bubbleDiv.style.background = "linear-gradient(135deg, #312E81 0%, #4338CA 100%)";
+                bubbleDiv.style.color = "#ffffff";
+                bubbleDiv.style.borderRadius = "18px 18px 4px 18px";
+            } else {
+                bubbleDiv.style.background = "#ffffff";
+                bubbleDiv.style.color = "var(--lh-text-dark)";
+                bubbleDiv.style.border = "1px solid #E5E7EB";
+                bubbleDiv.style.borderRadius = "18px 18px 18px 4px";
+            }
+
+            if (msg.content) {
+                const textPara = document.createElement("div");
+                textPara.textContent = msg.content;
+                bubbleDiv.appendChild(textPara);
+            }
+
+            if (msg.image_url) {
+                const imgContainer = document.createElement("div");
+                imgContainer.className = "mt-2";
+                imgContainer.innerHTML = `<a href="${msg.image_url}" target="_blank"><img src="${msg.image_url}" class="img-fluid rounded-3 border shadow-sm" style="max-height:240px; object-fit:cover;" alt="Photo attachment"></a>`;
+                bubbleDiv.appendChild(imgContainer);
+            }
+
+            msgDiv.appendChild(metaSpan);
+            msgDiv.appendChild(bubbleDiv);
+            chatBox.appendChild(msgDiv);
+
+            if (msg.id > lastMsgId) {
+                lastMsgId = msg.id;
+            }
+            scrollToBottom();
+        }
+
+        function fetchNewMessages() {
+            fetch(`/chat/api/messages/${conversationId}/?after_id=${lastMsgId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.is_blocked) {
+                        return;
+                    }
+                    // Real-time synchronization for unsent/deleted messages across all participants
+                    if (data.active_ids) {
+                        document.querySelectorAll('.msg-item').forEach(elem => {
+                            const mId = parseInt(elem.getAttribute('data-msg-id'));
+                            if (mId && !data.active_ids.includes(mId)) {
+                                elem.remove();
+                            }
+                        });
+                    }
+                    if (data.messages && data.messages.length > 0) {
+                        data.messages.forEach(msg => {
+                            if (!document.querySelector(`[data-msg-id="${msg.id}"]`)) {
+                                appendMessage(msg);
+                            }
+                        });
+                    }
+                })
+                .catch(err => console.log("Chat polling error:", err));
+        }
+
+        setInterval(fetchNewMessages, 2000);
+
+        if (chatForm) {
+            chatForm.addEventListener("submit", function(e) {
+                e.preventDefault();
+                const text = chatInput.value.trim();
+                const hasPhoto = imageInput.files && imageInput.files[0];
+
+                if (!text && !hasPhoto) return;
+
+                const formData = new FormData();
+                formData.append("content", text);
+                formData.append("csrfmiddlewaretoken", document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+                if (hasPhoto) {
+                    formData.append("image", imageInput.files[0]);
+                }
+
+                chatInput.value = "";
+                imageInput.value = "";
+                mediaPreviewBar.classList.add("d-none");
+
+                fetch(`/chat/api/send/${conversationId}/`, {
+                    method: "POST",
+                    body: formData,
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.message) {
+                        appendMessage(data.message);
+                    } else if (data.error) {
+                        alert(data.error);
+                    }
+                })
+                .catch(err => {
+                    console.error("AJAX Send failed, falling back to HTTP submit:", err);
+                    chatForm.submit();
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

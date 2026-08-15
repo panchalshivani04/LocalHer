@@ -1,0 +1,99 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+
+{% block title %}Sellers Management — LocalHer Admin{% endblock %}
+{% block page_heading %}Sellers & Storefront Profiles{% endblock %}
+
+{% block content %}
+<div class="lh-admin-card p-4 mb-4">
+    <form method="GET" action="" class="row g-3 align-items-center">
+        <div class="col-md-9">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                <input type="text" name="q" value="{{ query }}" class="form-control border-start-0" placeholder="Search by business name, owner username, city, area...">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-lh-accent w-100 fw-semibold">Search Sellers</button>
+        </div>
+    </form>
+</div>
+
+<div class="lh-admin-card">
+    <div class="table-responsive">
+        <table class="table table-lh-admin align-middle">
+            <thead>
+                <tr>
+                    <th>Business Storefront</th>
+                    <th>Owner Account</th>
+                    <th>WhatsApp / Contact</th>
+                    <th>Location</th>
+                    <th>Products</th>
+                    <th>Verification Badge</th>
+                    <th>Account Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for seller in sellers %}
+                <tr>
+                    <td>
+                        <div class="fw-bold text-dark mb-0 fs-6">{{ seller.business_name }}</div>
+                        <div class="small text-muted">Created {{ seller.created_at|date:"M Y" }}</div>
+                    </td>
+                    <td>
+                        <div class="fw-semibold text-dark">{{ seller.user.username }}</div>
+                        <div class="small text-muted">{{ seller.user.email|default:"No email" }}</div>
+                    </td>
+                    <td class="small"><i class="fa-brands fa-whatsapp text-success me-1"></i> {{ seller.whatsapp_number }}</td>
+                    <td class="small">{{ seller.city }}, {{ seller.area }} ({{ seller.pincode }})</td>
+                    <td>
+                        <span class="badge bg-primary-subtle text-primary px-2.5 py-1 rounded-pill fw-semibold">{{ seller.product_count }} Listings</span>
+                    </td>
+                    <td>
+                        {% if seller.is_verified %}
+                            <span class="badge bg-success-subtle text-success px-2.5 py-1 rounded-pill fw-semibold"><i class="fa-solid fa-circle-check me-1"></i> Verified</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary px-2.5 py-1 rounded-pill fw-semibold">Unverified</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if seller.user.is_active %}
+                            <span class="badge bg-success-subtle text-success px-2.5 py-1 rounded-pill fw-semibold">🟢 Active</span>
+                        {% else %}
+                            <span class="badge bg-danger-subtle text-danger px-2.5 py-1 rounded-pill fw-semibold">🔴 Blocked</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <form method="POST" action="{% url 'admin_dashboard:toggle_seller_verification' seller.id %}">
+                                {% csrf_token %}
+                                {% if seller.is_verified %}
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5 py-1 small fw-semibold" title="Remove Verification Badge">Unverify</button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5 py-1 small fw-semibold" title="Verify Business">Verify ✅</button>
+                                {% endif %}
+                            </form>
+
+                            <form method="POST" action="{% url 'admin_dashboard:toggle_user_status' seller.user.id %}">
+                                {% csrf_token %}
+                                {% if seller.user.is_active %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-1 small fw-semibold" onclick="return confirm('Block {{ seller.business_name }} owner from logging in?');">Block</button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5 py-1 small fw-semibold">Restore</button>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-muted small">
+                        No seller profiles found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

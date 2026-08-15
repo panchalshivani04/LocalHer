@@ -39,11 +39,20 @@
                     </div>
                     <div class="col-md-4 text-md-end mt-3 mt-md-0">
                         <div class="fw-bold fs-4 text-danger mb-2">₹{{ order.total_amount }}</div>
-                        {% if order.seller.whatsapp_number %}
-                        <a href="https://wa.me/91{{ order.seller.whatsapp_number }}?text=Hi%20{{ order.seller.business_name }},%20regarding%20my%20Order%20%23{{ order.id }}..." target="_blank" class="btn btn-sm btn-whatsapp">
-                            <i class="fa-brands fa-whatsapp me-1"></i> Chat on WhatsApp
-                        </a>
-                        {% endif %}
+                        <div class="d-flex align-items-center justify-content-md-end gap-2">
+                            <a href="{% url 'start_chat' order.seller.slug %}" class="btn btn-sm btn-lh-accent fw-bold">
+                                <i class="fa-solid fa-comments me-1"></i> Chat with Seller
+                            </a>
+
+                            {% if order.status == 'PENDING' %}
+                            <form method="POST" action="{% url 'cancel_order' order.id %}" onsubmit="return confirm('Are you sure you want to cancel this pending order request?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger fw-semibold">
+                                    <i class="fa-solid fa-xmark me-1"></i> Cancel Request
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
 

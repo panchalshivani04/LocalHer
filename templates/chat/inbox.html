@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages & Chats — LocalHer{% endblock %}
+
+{% block content %}
+<div class="container py-4 pb-5">
+    <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+        <div>
+            <h3 class="fw-bold font-heading mb-1 text-dark">
+                <i class="fa-solid fa-comments text-danger me-2"></i> Messages & Conversations
+            </h3>
+            <p class="text-muted small mb-0">Private 1-on-1 chats between you and local neighborhood sellers or buyers.</p>
+        </div>
+    </div>
+
+    {% if threads %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="lh-card p-0 bg-white border shadow-sm rounded-4 overflow-hidden">
+                <div class="list-group list-group-flush">
+                    {% for item in threads %}
+                    <a href="{% url 'conversation_detail' item.conversation.id %}" class="list-group-item list-group-item-action p-3 p-md-4 d-flex align-items-center justify-content-between gap-3 border-bottom text-decoration-none">
+                        <div class="d-flex align-items-center gap-3 overflow-hidden">
+                            <!-- Avatar Letter -->
+                            <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold fs-5 flex-shrink-0 shadow-sm" style="width: 52px; height: 52px; background: {% if item.other.is_seller %}var(--lh-primary){% else %}var(--lh-accent){% endif %};">
+                                {{ item.other.avatar_letter }}
+                            </div>
+                            
+                            <div class="overflow-hidden">
+                                <div class="d-flex align-items-center gap-2">
+                                    <h6 class="fw-bold text-dark mb-0 text-truncate font-heading">{{ item.other.name }}</h6>
+                                    {% if item.other.is_seller %}
+                                    <span class="badge bg-light text-dark border" style="font-size: 0.65rem;">Seller</span>
+                                    {% endif %}
+
+                                    {% if item.is_blocked %}
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-0" style="font-size: 0.65rem;">Unavailable</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <span class="small text-muted d-block text-truncate mb-1" style="font-size: 0.8rem;">{{ item.other.subtext }}</span>
+                                
+                                {% if item.last_message %}
+                                <p class="mb-0 small text-secondary text-truncate" style="max-width: 380px;">
+                                    {% if item.last_message.sender == user %}
+                                    <span class="fw-semibold text-muted">You:</span>
+                                    {% endif %}
+
+                                    {% if item.last_message.image %}
+                                    <i class="fa-solid fa-camera text-primary me-1"></i> [Photo]
+                                    {% endif %}
+
+                                    {{ item.last_message.content }}
+                                </p>
+                                {% else %}
+                                <span class="small text-muted fst-italic">No messages yet. Say hello!</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="text-end flex-shrink-0">
+                            {% if item.last_message %}
+                            <span class="small text-muted d-block mb-1" style="font-size: 0.75rem;">
+                                {{ item.last_message.timestamp|date:"h:i A" }}
+                            </span>
+                            {% endif %}
+
+                            {% if item.unread_count > 0 %}
+                            <span class="badge bg-danger rounded-pill px-2 py-1 small fw-bold">
+                                {{ item.unread_count }} new
+                            </span>
+                            {% endif %}
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="lh-card p-5 text-center bg-white border shadow-sm rounded-4 max-w-xl mx-auto my-4">
+        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3 text-muted" style="width: 80px; height: 80px; background: #F3F4F6;">
+            <i class="fa-solid fa-comments fs-1 opacity-50"></i>
+        </div>
+        <h4 class="fw-bold mb-2 text-dark font-heading">No Conversations Yet</h4>
+        <p class="text-muted mb-4 fs-6">Explore local listings and click <strong>"Chat with Seller"</strong> to inquire about products or services directly.</p>
+        <a href="{% url 'marketplace' %}" class="btn btn-lh-accent btn-lg px-5 py-3 fw-bold">
+            <i class="fa-solid fa-store me-2"></i> Browse Marketplace
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

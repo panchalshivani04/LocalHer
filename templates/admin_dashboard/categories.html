@@ -1,0 +1,68 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+
+{% block title %}Categories Management — LocalHer Admin{% endblock %}
+{% block page_heading %}Categories Management{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Add Category Card -->
+    <div class="col-lg-4">
+        <div class="lh-admin-card p-4">
+            <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-plus-circle text-danger me-2"></i>Add New Category</h5>
+            <form method="POST" action="{% url 'admin_dashboard:add_category' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Category Name</label>
+                    <input type="text" name="name" class="form-control" placeholder="e.g. Handmade Crafts" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Font Awesome Icon Class</label>
+                    <input type="text" name="icon" class="form-control" placeholder="e.g. fa-utensils" value="fa-tag">
+                    <div class="form-text small">Example: <code>fa-jar</code>, <code>fa-vest</code>, <code>fa-cake-candles</code></div>
+                </div>
+                <button type="submit" class="btn btn-lh-accent w-100 py-2 fw-semibold">
+                    <i class="fa-solid fa-save me-1"></i> Create Category
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Category List Table -->
+    <div class="col-lg-8">
+        <div class="lh-admin-card">
+            <div class="table-responsive">
+                <table class="table table-lh-admin align-middle">
+                    <thead>
+                        <tr>
+                            <th>Icon</th>
+                            <th>Category Name</th>
+                            <th>Slug</th>
+                            <th>Active Products</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cat in categories %}
+                        <tr>
+                            <td>
+                                <div class="rounded-3 bg-danger-subtle text-danger d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px; font-size: 1.1rem;">
+                                    <i class="fa-solid {{ cat.icon|default:'fa-tag' }}"></i>
+                                </div>
+                            </td>
+                            <td class="fw-bold text-dark fs-6">{{ cat.name }}</td>
+                            <td><code class="text-muted">{{ cat.slug }}</code></td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary px-3 py-1.5 rounded-pill fw-semibold">{{ cat.product_count }} Products</span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted small">No categories registered yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

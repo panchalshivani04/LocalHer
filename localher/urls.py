@@ -5,10 +5,12 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('localher-admin/', include('admin_dashboard.urls')),
     path('', include('accounts.urls')),
     path('', include('marketplace.urls')),
     path('', include('orders.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('chat/', include('chat.urls')),
 ]
 
 if settings.DEBUG:

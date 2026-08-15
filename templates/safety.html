@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Safety & Moderation Guidelines — LocalHer{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 850px;">
+    <div class="lh-card p-4 p-md-5 bg-white border rounded-4 shadow-sm">
+        <h2 class="fw-bold font-heading text-dark mb-4">Safety & Moderation Guidelines</h2>
+        
+        <p class="text-muted leading-relaxed mb-4">
+            LocalHer is committed to providing a safe, respectful environment for local women entrepreneurs and customers.
+        </p>
+
+        <h5 class="fw-bold text-dark mt-4 mb-2">1. Personal Blocking (Level 1)</h5>
+        <p class="text-muted leading-relaxed">
+            Any user can block another user specifically for themselves in chat. Once blocked, the other party cannot send messages or start new conversations with you.
+        </p>
+
+        <h5 class="fw-bold text-dark mt-4 mb-2">2. Reporting Violations (Level 2 Moderation)</h5>
+        <p class="text-muted leading-relaxed">
+            If you encounter harassment, spam, scams, or inappropriate behavior, submit a report via the chat menu. Reports are reviewed by administrators who take action including warnings, account suspensions, or permanent blocks.
+        </p>
+
+        <h5 class="fw-bold text-dark mt-4 mb-2">3. Media Protection</h5>
+        <p class="text-muted leading-relaxed">
+            All images shared in chat are protected and accessible only to conversation participants. Voice recordings are permanently disabled for safety and privacy.
+        </p>
+
+        <hr class="my-4">
+        <a href="{% url 'marketplace' %}" class="btn btn-lh-accent px-4 py-2 fw-bold">Back to Marketplace</a>
+    </div>
+</div>
+{% endblock %}

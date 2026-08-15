@@ -1,0 +1,103 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+
+{% block title %}Products Catalog — LocalHer Admin{% endblock %}
+{% block page_heading %}Products Catalog & Moderation{% endblock %}
+
+{% block content %}
+<div class="lh-admin-card p-4 mb-4">
+    <form method="GET" action="" class="row g-3 align-items-center">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                <input type="text" name="q" value="{{ query }}" class="form-control border-start-0" placeholder="Search product title, description, seller...">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select name="category" class="form-select">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if category_id == cat.id|stringformat:"i" %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-lh-accent w-100 fw-semibold">Filter</button>
+        </div>
+    </form>
+</div>
+
+<div class="lh-admin-card">
+    <div class="table-responsive">
+        <table class="table table-lh-admin align-middle">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Seller</th>
+                    <th>Price</th>
+                    <th>Listing Type</th>
+                    <th>Availability</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.title }}" class="rounded-3 object-fit-cover" style="width: 48px; height: 48px;">
+                            {% else %}
+                                <div class="rounded-3 bg-light d-flex align-items-center justify-content-center text-muted border" style="width: 48px; height: 48px;">
+                                    <i class="fa-solid fa-image"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <a href="{% url 'product_detail' product.slug %}" target="_blank" class="fw-bold text-dark text-decoration-none d-block mb-0">{{ product.title }}</a>
+                                <span class="small text-muted">Listed {{ product.created_at|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark border px-2.5 py-1.5 rounded-pill">{{ product.category.name }}</span>
+                    </td>
+                    <td>
+                        <div class="fw-semibold text-dark">{{ product.seller.business_name }}</div>
+                        <div class="small text-muted">@{{ product.seller.user.username }}</div>
+                    </td>
+                    <td class="fw-bold text-danger">₹{{ product.price }}</td>
+                    <td>
+                        {% if product.listing_type == 'SERVICE' %}
+                            <span class="badge bg-info-subtle text-info px-2.5 py-1 rounded-pill">Service</span>
+                        {% else %}
+                            <span class="badge bg-success-subtle text-success px-2.5 py-1 rounded-pill">Product</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if product.is_available %}
+                            <span class="badge bg-success-subtle text-success px-2.5 py-1 rounded-pill fw-semibold">Available</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary px-2.5 py-1 rounded-pill fw-semibold">Unavailable</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="POST" action="{% url 'admin_dashboard:delete_product' product.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-semibold small" onclick="return confirm('Remove product listing {{ product.title }}?');">
+                                <i class="fa-solid fa-trash me-1"></i> Remove
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted small">
+                        No products found matching criteria.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

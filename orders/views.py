@@ -117,6 +117,23 @@ def checkout_view(request):
 
         # Clear cart
         cart_items.delete()
+
+        # Send automated pending order message notification in chat thread
+        from chat.models import Conversation, Message
+        for order in created_orders:
+            try:
+                conv, _ = Conversation.objects.get_or_create(customer=request.user, seller=order.seller)
+                order_items_list = ", ".join([f"{i.quantity}x {i.product.title}" for i in order.items.all()])
+                msg_text = f"🛒 ORDER REQUEST PLACED (Order #{order.id})\nItems: {order_items_list}\nTotal: ₹{order.total_amount}\nStatus: ⏳ PENDING SELLER ACCEPTANCE"
+                Message.objects.create(
+                    conversation=conv,
+                    sender=request.user,
+                    content=msg_text
+                )
+                conv.save()
+            except Exception:
+                pass
+
         messages.success(request, "Your Order Request has been submitted successfully to the sellers!")
         return redirect('customer_orders')
 
@@ -151,3 +168,38 @@ def toggle_favorite_view(request, product_id):
 def customer_orders_view(request):
     orders = Order.objects.filter(customer=request.user).prefetch_related('items__product', 'seller')
     return render(request, 'orders/customer_orders.html', {'orders': orders})
+
+
+@login_required
+def cancel_order_view(request, order_id):
+    """
+    Customer can cancel their pending order request before seller accepts it.
+    """
+    if request.method != 'POST':
+        return redirect('customer_orders')
+
+    order = get_object_or_404(Order, id=order_id, customer=request.user)
+
+    if order.status != 'PENDING':
+        messages.warning(request, f"Order #{order.id} cannot be cancelled because it is already {order.get_status_display().lower()}.")
+        return redirect('customer_orders')
+
+    order.status = 'CANCELLED'
+    order.save()
+    messages.success(request, f"Order Request #{order.id} has been cancelled.")
+
+    # Automatically notify Seller in Chat thread
+    try:
+        from chat.models import Conversation, Message
+        conv, _ = Conversation.objects.get_or_create(customer=request.user, seller=order.seller)
+        msg_text = f"❌ ORDER REQUEST #{order.id} CANCELLED BY CUSTOMER"
+        Message.objects.create(
+            conversation=conv,
+            sender=request.user,
+            content=msg_text
+        )
+        conv.save()
+    except Exception:
+        pass
+
+    return redirect('customer_orders')

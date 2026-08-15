@@ -1,0 +1,177 @@
+{% extends 'admin_dashboard/base_admin.html' %}
+
+{% block title %}Dashboard Overview — LocalHer Admin{% endblock %}
+{% block page_heading %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<!-- Real-Time Database Statistics Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="lh-stat-card d-flex align-items-center justify-content-between">
+            <div>
+                <span class="text-muted small fw-semibold text-uppercase">Customers</span>
+                <h3 class="fw-extrabold mb-0 mt-1" style="color: #1E1B4B;">{{ customers_count }}</h3>
+            </div>
+            <div class="lh-stat-icon bg-primary-subtle text-primary">
+                <i class="fa-solid fa-users"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="lh-stat-card d-flex align-items-center justify-content-between">
+            <div>
+                <span class="text-muted small fw-semibold text-uppercase">Registered Sellers</span>
+                <h3 class="fw-extrabold mb-0 mt-1" style="color: #1E1B4B;">{{ sellers_count }}</h3>
+            </div>
+            <div class="lh-stat-icon bg-danger-subtle text-danger">
+                <i class="fa-solid fa-store"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="lh-stat-card d-flex align-items-center justify-content-between">
+            <div>
+                <span class="text-muted small fw-semibold text-uppercase">Active Products</span>
+                <h3 class="fw-extrabold mb-0 mt-1" style="color: #1E1B4B;">{{ products_count }}</h3>
+            </div>
+            <div class="lh-stat-icon bg-success-subtle text-success">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="lh-stat-card d-flex align-items-center justify-content-between">
+            <div>
+                <span class="text-muted small fw-semibold text-uppercase">Pending Reports</span>
+                <h3 class="fw-extrabold mb-0 mt-1" style="color: {% if pending_reports_count > 0 %}#DC2626{% else %}#059669{% endif %};">{{ pending_reports_count }}</h3>
+            </div>
+            <div class="lh-stat-icon bg-warning-subtle text-warning">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-xl-4 col-md-6">
+        <div class="lh-stat-card d-flex align-items-center justify-content-between">
+            <div>
+                <span class="text-muted small fw-semibold text-uppercase">Total Orders</span>
+                <h4 class="fw-extrabold mb-0 mt-1" style="color: #1E1B4B;">{{ orders_count }}</h4>
+            </div>
+            <div class="lh-stat-icon bg-info-subtle text-info">
+                <i class="fa-solid fa-bag-shopping"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6">
+        <div class="lh-stat-card d-flex align-items-center justify-content-between">
+            <div>
+                <span class="text-muted small fw-semibold text-uppercase">Customer Reviews</span>
+                <h4 class="fw-extrabold mb-0 mt-1" style="color: #1E1B4B;">{{ reviews_count }}</h4>
+            </div>
+            <div class="lh-stat-icon bg-warning-subtle text-warning">
+                <i class="fa-solid fa-star"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6">
+        <div class="lh-stat-card d-flex align-items-center justify-content-between">
+            <div>
+                <span class="text-muted small fw-semibold text-uppercase">Blocked Accounts</span>
+                <h4 class="fw-extrabold mb-0 mt-1" style="color: {% if blocked_users_count > 0 %}#DC2626{% else %}#64748B{% endif %};">{{ blocked_users_count }}</h4>
+            </div>
+            <div class="lh-stat-icon bg-secondary-subtle text-secondary">
+                <i class="fa-solid fa-user-slash"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Activity Layout -->
+<div class="row g-4">
+    <!-- Pending Moderation Queue -->
+    <div class="col-lg-7">
+        <div class="lh-admin-card">
+            <div class="p-3.5 px-4 bg-white border-bottom d-flex align-items-center justify-content-between">
+                <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-shield-cat text-danger me-2"></i>Pending Safety Reports</h6>
+                <a href="{% url 'admin_dashboard:reports' %}" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-semibold">View All Queue</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-lh-admin align-middle">
+                    <thead>
+                        <tr>
+                            <th>Reporter</th>
+                            <th>Reported User</th>
+                            <th>Reason</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in pending_reports %}
+                        <tr>
+                            <td class="fw-semibold">{{ report.reporter.username }}</td>
+                            <td class="text-danger fw-bold">{{ report.reported_user.username }}</td>
+                            <td><span class="badge bg-danger-subtle text-danger px-2.5 py-1.5 rounded-pill">{{ report.get_reason_display }}</span></td>
+                            <td class="small text-muted">{{ report.created_at|date:"M d, H:i" }}</td>
+                            <td>
+                                <a href="{% url 'admin_dashboard:reports' %}" class="btn btn-sm btn-lh-accent rounded-pill px-3 py-1 fw-semibold small">Review</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted small">
+                                <i class="fa-solid fa-circle-check text-success fs-4 d-block mb-2"></i>
+                                No pending moderation reports! All clear.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Registrations Stream -->
+    <div class="col-lg-5">
+        <div class="lh-admin-card">
+            <div class="p-3.5 px-4 bg-light border-bottom d-flex align-items-center justify-content-between">
+                <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-user-plus text-primary me-2"></i>Recent Registrations</h6>
+                <a href="{% url 'admin_dashboard:customers' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold">Manage Users</a>
+            </div>
+            <div class="p-3">
+                <div class="d-flex flex-column gap-2.5">
+                    {% for user in recent_users %}
+                    <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 bg-light border">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                                {{ user.username|slice:":1"|upper }}
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark fs-6 mb-0">{{ user.username }}</div>
+                                <div class="small text-muted">{{ user.date_joined|date:"M d, Y" }} &bull; {{ user.city|default:"Local" }}</div>
+                            </div>
+                        </div>
+                        <div>
+                            {% if user.is_seller %}
+                                <span class="badge bg-danger-subtle text-danger px-2.5 py-1 rounded-pill">Seller</span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary px-2.5 py-1 rounded-pill">Customer</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted small text-center my-3">No users registered yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

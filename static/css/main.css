@@ -245,25 +245,43 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 /* Footer */
 footer.lh-footer {
     margin-top: auto;
-    background-color: var(--lh-primary);
-    color: #9CA3AF;
+    background: #0F172A;
+    color: #E2E8F0;
     padding: 4rem 0 2rem;
+    border-top: 1px solid #1E293B;
 }
 
 footer.lh-footer h5 {
     color: #FFFFFF;
     font-weight: 700;
-    margin-bottom: 1.4rem;
+    margin-bottom: 1.2rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+    text-uppercase: uppercase;
 }
 
-footer.lh-footer a {
-    color: #D1D5DB;
+footer.lh-footer p,
+footer.lh-footer span,
+footer.lh-footer li,
+footer.lh-footer a,
+footer.lh-footer .text-muted,
+footer.lh-footer .small {
+    color: #CBD5E1 !important;
+    font-size: 0.92rem !important;
+    line-height: 1.6;
+}
+
+footer.lh-footer a,
+footer.lh-footer a.text-muted {
     text-decoration: none;
-    transition: var(--lh-transition);
+    transition: all 0.2s ease-in-out;
 }
 
-footer.lh-footer a:hover {
-    color: var(--lh-accent);
+footer.lh-footer a:hover,
+footer.lh-footer a.text-muted:hover {
+    color: #FF9E93 !important;
+    transform: translateX(4px);
+    display: inline-block;
 }
 
 /* Toast Messages */

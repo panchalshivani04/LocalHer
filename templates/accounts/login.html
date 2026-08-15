@@ -17,6 +17,13 @@
 
                 <form method="POST" action="">
                     {% csrf_token %}
+
+                    {% if login_error %}
+                    <div class="alert alert-danger py-2.5 px-3 rounded-3 small mb-4 border-0 d-flex align-items-center gap-2 shadow-sm" style="background: #FEF2F2; color: #DC2626; border-left: 4px solid #EF4444 !important;">
+                        <i class="fa-solid fa-circle-exclamation fs-5 flex-shrink-0"></i>
+                        <div class="fw-semibold">{{ login_error }}</div>
+                    </div>
+                    {% endif %}
                     <div class="mb-3">
                         <label class="form-label fw-semibold small">Username</label>
                         <input type="text" name="username" class="form-control" placeholder="Enter your username" required autofocus>

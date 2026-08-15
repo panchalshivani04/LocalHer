@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from .forms import CustomerRegistrationForm, SellerRegistrationForm, UserProfileForm
-from .models import SellerProfile
+from .models import User, SellerProfile
 from marketplace.models import Category, Product
 
 
@@ -14,6 +14,8 @@ def landing_view(request):
     and call to action for customers and sellers.
     """
     if request.user.is_authenticated:
+        if request.user.is_superuser:
+            return redirect('admin_dashboard:index')
         return redirect('home')
 
     categories = Category.objects.all()[:8]
@@ -114,11 +116,19 @@ def register_seller_view(request):
 
 def login_view(request):
     """
-    Standard user login view.
+    Standard user login view with role-based redirection.
+    - Superusers -> Custom Admin Dashboard (/localher-admin/)
+    - Sellers -> Seller Dashboard (/dashboard/)
+    - Customers -> Home (/home/)
     """
     if request.user.is_authenticated:
+        if request.user.is_superuser:
+            return redirect('admin_dashboard:index')
+        elif getattr(request.user, 'is_seller', False):
+            return redirect('seller_dashboard')
         return redirect('home')
 
+    login_error = None
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -136,15 +146,23 @@ def login_view(request):
             next_url = request.GET.get('next')
             if next_url:
                 return redirect(next_url)
+
+            if user.is_superuser:
+                return redirect('admin_dashboard:index')
             if user.is_seller:
                 return redirect('seller_dashboard')
             return redirect('home')
         else:
-            messages.error(request, "Invalid username or password.")
+            username = request.POST.get('username')
+            inactive_user = User.objects.filter(username=username, is_active=False).first()
+            if inactive_user:
+                login_error = "⛔ Your account has been suspended or permanently blocked by the platform administrator."
+            else:
+                login_error = "Invalid username or password. Please try again."
     else:
         form = AuthenticationForm()
 
-    return render(request, 'accounts/login.html', {'form': form})
+    return render(request, 'accounts/login.html', {'form': form, 'login_error': login_error})
 
 
 def logout_view(request):

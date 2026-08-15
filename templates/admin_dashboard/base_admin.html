@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LocalHer Admin Command Center{% endblock %}</title>
+
+    <!-- Google Fonts & Font Awesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Bootstrap 5 CSS & Main Theme -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+    <style>
+        :root {
+            --lh-admin-bg: #F8FAFC;
+            --lh-admin-card-bg: #FFFFFF;
+            --lh-admin-sidebar-bg: #0F172A;
+            --lh-admin-header-bg: #1E1B4B;
+            --lh-admin-accent: #E05A47;
+            --lh-admin-text: #1E293B;
+            --lh-admin-border: #E2E8F0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--lh-admin-bg);
+            color: var(--lh-admin-text);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Layout Structure */
+        .lh-admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styling */
+        .lh-admin-sidebar {
+            width: 260px;
+            background-color: var(--lh-admin-sidebar-bg);
+            color: #94A3B8;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1040;
+        }
+
+        .lh-admin-sidebar .brand-header {
+            padding: 1.5rem 1.25rem;
+            border-bottom: 1px solid #1E293B;
+            background: #090D16;
+        }
+
+        .lh-admin-nav {
+            padding: 1.25rem 0.75rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .lh-admin-nav .nav-heading {
+            font-size: 0.72rem;
+            text-uppercase: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748B;
+            font-weight: 700;
+            padding: 0.75rem 0.75rem 0.4rem;
+        }
+
+        .lh-admin-nav .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.7rem 0.9rem;
+            color: #94A3B8;
+            font-size: 0.92rem;
+            font-weight: 600;
+            border-radius: 10px;
+            text-decoration: none;
+            margin-bottom: 3px;
+            transition: all 0.2s ease;
+        }
+
+        .lh-admin-nav .nav-link:hover {
+            color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(3px);
+        }
+
+        .lh-admin-nav .nav-link.active {
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #E05A47 0%, #C03825 100%);
+            box-shadow: 0 4px 12px rgba(224, 90, 71, 0.3);
+        }
+
+        .lh-admin-nav .nav-link .badge {
+            margin-left: auto;
+            font-size: 0.75rem;
+            border-radius: 20px;
+        }
+
+        /* Main Content Container */
+        .lh-admin-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* Top Header Navigation */
+        .lh-admin-header {
+            height: 70px;
+            background: #FFFFFF;
+            border-bottom: 1px solid var(--lh-admin-border);
+            padding: 0 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Card Controls */
+        .lh-admin-card {
+            background: var(--lh-admin-card-bg);
+            border: 1px solid var(--lh-admin-border);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+        }
+
+        .lh-stat-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 1.4rem 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .lh-stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.06);
+        }
+
+        .lh-stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        /* Sleek Modern Table Design System */
+        .table-lh-admin {
+            margin-bottom: 0;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-lh-admin thead {
+            background-color: #F8FAFC;
+        }
+
+        .table-lh-admin thead th {
+            background-color: #F8FAFC !important;
+            color: #475569 !important;
+            font-size: 0.76rem !important;
+            text-uppercase: uppercase !important;
+            letter-spacing: 0.06em !important;
+            font-weight: 700 !important;
+            padding: 0.85rem 1.25rem !important;
+            border-top: 1px solid #E2E8F0 !important;
+            border-bottom: 1px solid #E2E8F0 !important;
+            white-space: nowrap;
+        }
+
+        .table-lh-admin tbody tr {
+            background-color: #FFFFFF;
+            transition: background-color 0.15s ease-in-out;
+        }
+
+        .table-lh-admin tbody tr:hover {
+            background-color: #F8FAFC !important;
+        }
+
+        .table-lh-admin tbody tr:nth-child(even) {
+            background-color: #FAFAFA;
+        }
+
+        .table-lh-admin tbody td {
+            padding: 0.95rem 1.25rem !important;
+            vertical-align: middle;
+            font-size: 0.9rem !important;
+            border-bottom: 1px solid #F1F5F9 !important;
+            color: #1E293B;
+        }
+
+        /* Responsive Mobile Drawer & Backdrop Overlay */
+        .lh-admin-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1035;
+        }
+
+        .lh-admin-backdrop.show {
+            display: block;
+        }
+
+        @media (max-width: 991.98px) {
+            .lh-admin-sidebar {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: -280px;
+                width: 280px;
+                box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+            }
+            .lh-admin-sidebar.show {
+                left: 0;
+            }
+            .lh-admin-header {
+                padding: 0 1.25rem !important;
+            }
+            .table-responsive {
+                border-radius: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="lh-admin-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="lh-admin-sidebar" id="adminSidebar">
+        <div class="brand-header d-flex align-items-center justify-content-between">
+            <a href="{% url 'admin_dashboard:index' %}" class="text-decoration-none">
+                <span class="fs-4 fw-extrabold text-white"><i class="fa-solid fa-shield-halved text-danger me-2"></i>Local<span style="color: var(--lh-admin-accent);">Her</span></span>
+                <span class="badge bg-danger-subtle text-danger ms-2 px-2 py-1 small rounded-pill" style="font-size: 0.7rem;">ADMIN</span>
+            </a>
+            <button class="btn btn-sm text-white-50 d-lg-none" id="sidebarCloseBtn"><i class="fa-solid fa-xmark fs-5"></i></button>
+        </div>
+
+        <nav class="lh-admin-nav">
+            <div class="nav-heading">Main Command</div>
+            <a href="{% url 'admin_dashboard:index' %}" class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                <i class="fa-solid fa-chart-line"></i> Dashboard
+            </a>
+
+            <div class="nav-heading">User & Storefronts</div>
+            <a href="{% url 'admin_dashboard:customers' %}" class="nav-link {% if request.resolver_match.url_name == 'customers' %}active{% endif %}">
+                <i class="fa-solid fa-users"></i> Customers
+            </a>
+            <a href="{% url 'admin_dashboard:sellers' %}" class="nav-link {% if request.resolver_match.url_name == 'sellers' %}active{% endif %}">
+                <i class="fa-solid fa-store"></i> Sellers & Storefronts
+            </a>
+            <a href="{% url 'admin_dashboard:businesses' %}" class="nav-link {% if request.resolver_match.url_name == 'businesses' %}active{% endif %}">
+                <i class="fa-solid fa-building-user"></i> Business Directory
+            </a>
+
+            <div class="nav-heading">Marketplace Management</div>
+            <a href="{% url 'admin_dashboard:products' %}" class="nav-link {% if request.resolver_match.url_name == 'products' %}active{% endif %}">
+                <i class="fa-solid fa-box-open"></i> Products Catalog
+            </a>
+            <a href="{% url 'admin_dashboard:categories' %}" class="nav-link {% if request.resolver_match.url_name == 'categories' %}active{% endif %}">
+                <i class="fa-solid fa-layer-group"></i> Categories
+            </a>
+            <a href="{% url 'admin_dashboard:reviews' %}" class="nav-link {% if request.resolver_match.url_name == 'reviews' %}active{% endif %}">
+                <i class="fa-solid fa-star"></i> Customer Reviews
+            </a>
+
+            <div class="nav-heading">Safety & Moderation</div>
+            <a href="{% url 'admin_dashboard:reports' %}" class="nav-link {% if request.resolver_match.url_name == 'reports' %}active{% endif %}">
+                <i class="fa-solid fa-triangle-exclamation"></i> Safety Reports
+            </a>
+            <a href="{% url 'admin_dashboard:blocked' %}" class="nav-link {% if request.resolver_match.url_name == 'blocked' %}active{% endif %}">
+                <i class="fa-solid fa-user-slash"></i> Blocked Accounts
+            </a>
+
+            <div class="nav-heading mt-3">Advanced Admin</div>
+            <a href="{% url 'admin:index' %}" target="_blank" class="nav-link">
+                <i class="fa-solid fa-gears"></i> Django Admin Portal <i class="fa-solid fa-up-right-from-square small ms-auto opacity-50"></i>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="lh-admin-main">
+        <!-- Top App Bar -->
+        <header class="lh-admin-header">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-light d-lg-none rounded-3 border" id="sidebarToggleBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="fw-bold fs-5 text-dark">
+                    {% block page_heading %}LocalHer Admin Command Center{% endblock %}
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <a href="{% url 'home' %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-semibold text-decoration-none">
+                    <i class="fa-solid fa-globe me-1"></i> Public Site
+                </a>
+                
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center gap-2 text-decoration-none dropdown-toggle text-dark fw-bold" data-bs-toggle="dropdown">
+                        <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px; font-size: 0.95rem;">
+                            {{ request.user.username|slice:":1"|upper }}
+                        </div>
+                        <span class="d-none d-md-inline">{{ request.user.get_full_name|default:request.user.username }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm rounded-3 border-0 mt-2">
+                        <li><span class="dropdown-item-text text-muted small">Logged in as Superuser</span></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger fw-semibold" href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket me-2"></i> Log Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <!-- System Alert Messages -->
+        <div class="container-fluid px-4 pt-3">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+                        <i class="fa-solid fa-circle-info me-2"></i> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Main Page Content Block -->
+        <main class="container-fluid px-4 py-4 flex-grow-1">
+            {% block content %}{% endblock %}
+        </main>
+    <!-- Mobile Backdrop Overlay -->
+    <div class="lh-admin-backdrop" id="adminBackdrop"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const sidebar = document.getElementById('adminSidebar');
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    const closeBtn = document.getElementById('sidebarCloseBtn');
+    const backdrop = document.getElementById('adminBackdrop');
+
+    function openSidebar() {
+        sidebar.classList.add('show');
+        backdrop.classList.add('show');
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('show');
+        backdrop.classList.remove('show');
+    }
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            if (sidebar.classList.contains('show')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        });
+    }
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeSidebar);
+    }
+    if (backdrop) {
+        backdrop.addEventListener('click', closeSidebar);
+    }
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

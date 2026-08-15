@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Terms of Service — LocalHer{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 850px;">
+    <div class="lh-card p-4 p-md-5 bg-white border rounded-4 shadow-sm">
+        <h2 class="fw-bold font-heading text-dark mb-4">Terms of Service</h2>
+        
+        <p class="text-muted leading-relaxed mb-4">
+            Welcome to LocalHer. By accessing or using our platform, you agree to comply with these Terms of Service.
+        </p>
+
+        <h5 class="fw-bold text-dark mt-4 mb-2">1. Local Community Guidelines</h5>
+        <p class="text-muted leading-relaxed">
+            LocalHer connects local buyers directly with verified women entrepreneurs in their neighborhood. Users agree to communicate respectfully and conduct transactions in good faith.
+        </p>
+
+        <h5 class="fw-bold text-dark mt-4 mb-2">2. Respectful Communication</h5>
+        <p class="text-muted leading-relaxed">
+            Harassment, spam, abusive language, or inappropriate messages are strictly prohibited. Violations will result in account warnings, suspension, or permanent platform block.
+        </p>
+
+        <h5 class="fw-bold text-dark mt-4 mb-2">3. Seller Responsibilities</h5>
+        <p class="text-muted leading-relaxed">
+            Sellers are responsible for providing accurate descriptions, pricing, and availability for their homemade products or services.
+        </p>
+
+        <hr class="my-4">
+        <a href="{% url 'marketplace' %}" class="btn btn-lh-accent px-4 py-2 fw-bold">Back to Marketplace</a>
+    </div>
+</div>
+{% endblock %}

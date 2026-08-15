@@ -28,13 +28,11 @@
                 <p class="small text-light opacity-75 max-w-xl mb-0">{{ seller.bio }}</p>
                 {% endif %}
             </div>
-            {% if seller.whatsapp_number or seller.user.phone_number %}
             <div class="col-lg-auto">
-                <a href="tel:{{ seller.whatsapp_number|default:seller.user.phone_number }}" class="btn btn-success btn-lg px-4 fs-6 rounded-pill shadow-sm fw-bold">
-                    <i class="fa-solid fa-phone me-2 fs-5"></i> Call Seller: +91 {{ seller.whatsapp_number|default:seller.user.phone_number }}
+                <a href="{% url 'start_chat' seller.slug %}" class="btn btn-lh-accent btn-lg px-4 fs-6 rounded-pill shadow-sm fw-bold">
+                    <i class="fa-solid fa-comments me-2 fs-5"></i> Chat with Seller
                 </a>
             </div>
-            {% endif %}
         </div>
     </div>
 </section>
