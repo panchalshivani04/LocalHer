@@ -204,7 +204,7 @@ LocalHer/
 
 ### 2. Clone the Repository
 ```bash
-git clone https://github.com/your-username/LocalHer.git
+git clone https://github.com/panchalshivani04/LocalHer.git
 cd LocalHer
 ```
 
@@ -260,11 +260,7 @@ Open **[http://127.0.0.1:8000/](http://127.0.0.1:8000/)** in your browser!
    - `DEBUG`: `False`
    - `ALLOWED_HOSTS`: `your-app-name.onrender.com`
 5. Render Build & Start Commands:
-   - **Build Command**: `pip install -r requirements.txt && python manage.py migrate`
+   - **Build Command**: `pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py init_superuser`
    - **Start Command**: `gunicorn localher.wsgi:application`
 
 ---
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
