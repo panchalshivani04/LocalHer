@@ -60,7 +60,7 @@
     </div>
 
     <!-- Tabs Navigation -->
-    <ul class="nav nav-pills nav-justified mb-4 p-1 bg-white rounded-4 shadow-sm border" id="dashboardTabs" role="tablist">
+    <ul class="nav nav-pills nav-justified flex-column flex-md-row mb-4 p-1 bg-white rounded-4 shadow-sm border gap-1" id="dashboardTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active fw-bold py-3 fs-6" id="products-tab" data-bs-toggle="tab" data-bs-target="#products-panel" type="button" role="tab">
                 <i class="fa-solid fa-box-open me-2"></i> My Products & Services ({{ products|length }})
@@ -89,7 +89,10 @@
                         <!-- Image Header with Badges -->
                         <div class="position-relative bg-light text-center img-zoom-container" style="height: 170px;">
                             {% if product.primary_image %}
-                            <img src="{{ product.primary_image.url }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ product.title }}">
+                            <img src="{{ product.primary_image.url }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ product.title }}" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="align-items-center justify-content-center h-100 text-muted bg-light" style="display: none;">
+                                <i class="fa-solid fa-image fs-1 opacity-25"></i>
+                            </div>
                             {% else %}
                             <div class="d-flex align-items-center justify-content-center h-100 text-muted bg-light">
                                 <i class="fa-solid fa-image fs-1 opacity-25"></i>

@@ -211,8 +211,62 @@
     <!-- Bootstrap 5.3 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Auto-dismiss alert toasts after 4 seconds
+        // Save scroll position when clicking Add to Cart or Favorite links/buttons/forms
+        document.addEventListener("click", function(e) {
+            const target = e.target.closest("a, button");
+            if (!target) return;
+
+            let isAction = false;
+            if (target.tagName === "A") {
+                const href = target.getAttribute("href") || "";
+                if (href.includes("/favorites/toggle/") || href.includes("/cart/add/")) {
+                    isAction = true;
+                }
+            } else if (target.tagName === "BUTTON") {
+                const form = target.form || target.closest("form");
+                const href = target.getAttribute("href") || "";
+                if (href.includes("/favorites/toggle/") || href.includes("/cart/add/")) {
+                    isAction = true;
+                } else if (form) {
+                    const action = form.getAttribute("action") || "";
+                    const isBuyNow = (target.name === "buy_now" && target.value === "true") ||
+                                     (form.querySelector('[name="buy_now"]') && form.querySelector('[name="buy_now"]').value === "true");
+                    if ((action.includes("/favorites/toggle/") || action.includes("/cart/add/")) && !isBuyNow) {
+                        isAction = true;
+                    }
+                }
+            }
+
+            if (isAction) {
+                sessionStorage.setItem("lh_scroll_pos", window.scrollY);
+            }
+        });
+
+        document.addEventListener("submit", function(e) {
+            const form = e.target;
+            const action = form.getAttribute("action") || "";
+            const submitter = e.submitter;
+            const isBuyNow = (submitter && submitter.name === "buy_now" && submitter.value === "true") ||
+                             (form.querySelector('[name="buy_now"]') && form.querySelector('[name="buy_now"]').value === "true");
+            if ((action.includes("/favorites/toggle/") || action.includes("/cart/add/")) && !isBuyNow) {
+                sessionStorage.setItem("lh_scroll_pos", window.scrollY);
+            }
+        });
+
+        // Auto-dismiss alert toasts after 4 seconds & restore scroll position
         document.addEventListener("DOMContentLoaded", function() {
+            const savedPos = sessionStorage.getItem("lh_scroll_pos");
+            if (savedPos !== null) {
+                sessionStorage.removeItem("lh_scroll_pos");
+                const pos = parseInt(savedPos, 10);
+                if (!isNaN(pos)) {
+                    window.scrollTo({ top: pos, behavior: "instant" });
+                    setTimeout(function() {
+                        window.scrollTo({ top: pos, behavior: "instant" });
+                    }, 50);
+                }
+            }
+
             setTimeout(function() {
                 let alerts = document.querySelectorAll('.messages-container .alert');
                 alerts.forEach(function(alert) {

@@ -130,7 +130,15 @@ def login_view(request):
 
     login_error = None
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        login_input = request.POST.get('username', '').strip()
+
+        post_data = request.POST.copy()
+        if '@' in login_input:
+            user_by_email = User.objects.filter(email__iexact=login_input).first()
+            if user_by_email:
+                post_data['username'] = user_by_email.username
+
+        form = AuthenticationForm(request, data=post_data)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
@@ -153,12 +161,11 @@ def login_view(request):
                 return redirect('seller_dashboard')
             return redirect('home')
         else:
-            username = request.POST.get('username')
-            inactive_user = User.objects.filter(username=username, is_active=False).first()
+            inactive_user = User.objects.filter(Q(username__iexact=login_input) | Q(email__iexact=login_input), is_active=False).first()
             if inactive_user:
                 login_error = "⛔ Your account has been suspended or permanently blocked by the platform administrator."
             else:
-                login_error = "Invalid username or password. Please try again."
+                login_error = "Invalid username/email or password. Please try again."
     else:
         form = AuthenticationForm()
 

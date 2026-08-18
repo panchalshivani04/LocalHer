@@ -44,6 +44,9 @@ def add_to_cart_view(request, product_id):
     if buy_now:
         return redirect('checkout')
         
+    next_url = request.META.get('HTTP_REFERER')
+    if next_url:
+        return redirect(next_url)
     return redirect('cart')
 
 

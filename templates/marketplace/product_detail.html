@@ -97,7 +97,7 @@
                     </button>
 
                     <a href="{% url 'toggle_favorite' product.id %}" class="btn btn-lh-outline btn-lg px-3 fs-6" title="Save Item">
-                        <i class="fa-regular fa-heart text-danger"></i>
+                        <i class="{% if product.id in user_favorite_product_ids %}fa-solid fa-heart text-danger{% else %}fa-regular fa-heart text-danger{% endif %}"></i>
                     </a>
                 </div>
             </form>

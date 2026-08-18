@@ -49,6 +49,9 @@
                             <i class="fa-solid fa-image fs-1 opacity-25"></i>
                         </div>
                         {% endif %}
+                        <a href="{% url 'toggle_favorite' product.id %}" class="position-absolute top-0 end-0 m-2 btn btn-sm bg-white rounded-circle shadow-sm px-2 py-1 text-danger" title="Save Item">
+                            <i class="{% if product.id in user_favorite_product_ids %}fa-solid fa-heart text-danger{% else %}fa-regular fa-heart text-secondary{% endif %} fs-6"></i>
+                        </a>
                     </div>
                     <div class="p-3 d-flex flex-column flex-grow-1">
                         <span class="badge-category mb-1 align-self-start">{{ product.category.name }}</span>

@@ -374,5 +374,67 @@ footer.lh-footer a.text-muted:hover {
     color: var(--lh-text-dark);
 }
 
+/* Responsive Global & Mobile Utilities */
+img, video {
+    max-width: 100%;
+    height: auto;
+}
+
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Toast Messages Responsive */
+@media (max-width: 576px) {
+    .messages-container {
+        top: 75px;
+        left: 12px;
+        right: 12px;
+        max-width: none;
+    }
+}
+
+/* Navbar Responsive Adjustments */
+@media (max-width: 991.98px) {
+    .navbar-localher {
+        padding: 0.75rem 1rem;
+    }
+    .role-switcher {
+        width: 100%;
+        justify-content: center;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .role-switcher .btn-mode {
+        flex: 1;
+        text-align: center;
+        padding: 6px 10px;
+        font-size: 0.82rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .navbar-brand-logo {
+        font-size: 1.3rem;
+    }
+    .brand-badge {
+        display: none;
+    }
+}
+
+/* Chat & Messages Responsive */
+.chat-bubble {
+    max-width: 85%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+@media (max-width: 576px) {
+    .chat-bubble {
+        max-width: 92%;
+    }
+}
+
 
 

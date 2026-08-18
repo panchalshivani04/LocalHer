@@ -108,7 +108,10 @@
                         <!-- Image Container -->
                         <div class="position-relative bg-light text-center img-zoom-container" style="height: 210px;">
                             {% if product.primary_image %}
-                            <img src="{{ product.primary_image.url }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ product.title }}">
+                            <img src="{{ product.primary_image.url }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ product.title }}" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="align-items-center justify-content-center h-100 text-muted bg-light" style="display: none;">
+                                <i class="fa-solid fa-image fs-1 opacity-25"></i>
+                            </div>
                             {% else %}
                             <div class="d-flex align-items-center justify-content-center h-100 text-muted bg-light">
                                 <i class="fa-solid fa-image fs-1 opacity-25"></i>
@@ -123,7 +126,7 @@
                             </div>
 
                             <a href="{% url 'toggle_favorite' product.id %}" class="position-absolute top-0 end-0 m-3 btn btn-sm bg-white rounded-circle shadow-sm px-2 py-1 text-danger" title="Save Item">
-                                <i class="fa-regular fa-heart fs-6"></i>
+                                <i class="{% if product.id in user_favorite_product_ids %}fa-solid fa-heart text-danger{% else %}fa-regular fa-heart text-secondary{% endif %} fs-6"></i>
                             </a>
                         </div>
 
